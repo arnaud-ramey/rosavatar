@@ -1,0 +1,23 @@
+<launch>
+<!-- camera node -->
+<remap from="image_raw" to="rgb"/>
+<node name="uvc_cam" pkg="uvc_camera" type="uvc_camera_node"
+    output="screen" respawn="false" >
+  <param name="device" value="/dev/video0" /> <!-- the device to use -->
+  <param name="width" value="320" />
+  <param name="height" value="240" />
+  <param name="fps" value="30" /> <!-- frames per second -->
+</node>
+
+<!-- rgb image to face coords -->
+<remap from="face2point/out"   to="/avatar/iris_position"/>
+<remap from="face2point/state" to="/avatar/state"/>
+<node pkg="rosavatar" type="face2point.exe" name="face2point"  output="screen" respawn="true"
+      args="_display:=true" />
+
+<node pkg="rosavatar" type="rosavatar.exe" name="avatar" output="screen" respawn="true"
+      args="_eyes_folder:=$(find rosavatar)/third_parties/avatar/data/mini_eyes"/>
+
+<node pkg="image_view" type="image_view"   name="avatar_viewer" output="screen" respawn="true"
+      args="image:=/avatar/eyes"/>
+</launch>
