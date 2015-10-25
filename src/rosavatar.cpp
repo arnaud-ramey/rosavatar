@@ -56,7 +56,7 @@ public:
     // get params
     std::string eyes_folder = "";
     nh_private.param("eyes_folder", eyes_folder, eyes_folder);
-    if (!load_eyes(eyes_folder)) {
+    if (!load_imgs(eyes_folder)) {
       ROS_FATAL("Could not load eyes folder '%s'\n", eyes_folder.c_str());
       ros::shutdown();
     }
