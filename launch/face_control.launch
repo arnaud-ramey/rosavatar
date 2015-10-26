@@ -16,7 +16,10 @@
       args="_display:=true" />
 
 <node pkg="rosavatar" type="rosavatar.exe" name="avatar" output="screen" respawn="true"
+      args=""/>
+<!--
       args="_eyes_folder:=$(find rosavatar)/third_parties/avatar/data/mini_eyes"/>
+-->
 
 <node pkg="image_view" type="image_view"   name="avatar_viewer" output="screen" respawn="true"
       args="image:=/avatar/eyes"/>

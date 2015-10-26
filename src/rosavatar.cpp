@@ -48,15 +48,15 @@ ________________________________________________________________________________
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
 // third parties
-#include "avatar/eyes_builder.h"
+#include "avatar/avatar.h"
 
-class RosAvatar : public EyeBuilder {
+class RosAvatar : public Avatar {
 public:
-  RosAvatar() : EyeBuilder(), nh_private("~") {
+  RosAvatar() : Avatar(), nh_private("~") {
     // get params
     std::string eyes_folder = "";
     nh_private.param("eyes_folder", eyes_folder, eyes_folder);
-    if (!load_imgs(eyes_folder)) {
+    if (!_eye.load_imgs(eyes_folder)) {
       ROS_FATAL("Could not load eyes folder '%s'\n", eyes_folder.c_str());
       ros::shutdown();
     }
@@ -71,24 +71,26 @@ public:
              img_pub.getTopic().c_str());
   }
 
-  void refresh() {
+  bool refresh() {
     if (img_pub.getNumSubscribers() == 0)
-      return;
-    redraw_eyes();
-    get_eyes().copyTo(bridge.image);
+      return true;
+    if (!redraw())
+      return false;
+    get_avatar().copyTo(bridge.image);
     bridge.header.stamp = ros::Time::now();
     img_pub.publish(bridge.toImageMsg());
+    return true;
   }
 
 private:
   void iris_pos_cb(const geometry_msgs::PointConstPtr & msg) {
     // printf("iris_pos_cb()\n");
-    move_both_iris(msg->x, msg->y);
+    move_iris(msg->x, msg->y);
   }
 
   void state_cb(const std_msgs::StringConstPtr & msg) {
     // printf("state_cb()\n");
-    set_state(msg->data);
+    _eye.set_state(msg->data);
   }
 
   ros::NodeHandle nh_public, nh_private;
