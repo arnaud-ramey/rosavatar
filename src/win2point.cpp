@@ -34,7 +34,7 @@ ros::Publisher point_pub;
 int h = 100;
 geometry_msgs::Point pt;
 
-void mouse_cb(int event, int x, int y, int flags, void* userdata) {
+void mouse_cb(int /*event*/, int x, int y, int /*flags*/, void* /*userdata*/) {
   //printf("mouse_cb:x:%i, y:%i\n", x, y);
   pt.x = 2. * x / h - 1;
   pt.y = 2. * y / h - 1;
