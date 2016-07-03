@@ -28,6 +28,7 @@ A GUI for moving eyes.
     the mouse in the window
  */
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 #include <geometry_msgs/Point.h>
 #include <ros/ros.h>
 ros::Publisher point_pub;

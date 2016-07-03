@@ -4,7 +4,7 @@
 #include <opencv2/features2d/features2d.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
-#include <vision_utils/img_path.h>
+//#include <vision_utils/img_path.h>
 #include <stdio.h>
 #include <cv_bridge/cv_bridge.h>
 
@@ -12,7 +12,7 @@ namespace image_utils {
 // face detection param
 
 static const std::string DEFAULT_FACE_CASCADE =
-    IMG_DIR
+    //IMG_DIR
     //"haarCascade_openCV/haarcascade_frontalface_alt.xml";
     "haarCascade_openCV/haarcascade_frontalface_alt2.xml";
 
