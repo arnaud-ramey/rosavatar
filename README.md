@@ -2,6 +2,5 @@
 
 [![Build Status](https://travis-ci.org/arnaud-ramey/rosavatar.svg)](https://travis-ci.org/arnaud-ramey/rosavatar)
 
-Extension of the "avatar" repo for ROS.
-
-"avatar": robotic avatar made of virtual face and eyes.
+The camera package provides nodes to acquire information from a camera device.
+    It wraps the popular driver packages "uvc_cam" and "usb_cam".
