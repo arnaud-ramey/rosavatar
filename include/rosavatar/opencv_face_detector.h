@@ -12,7 +12,7 @@ namespace image_utils {
 // face detection param
 
 static const std::string DEFAULT_FACE_CASCADE =
-    //IMG_DIR
+    //vision_utils::IMG_DIR() + 
     //"haarCascade_openCV/haarcascade_frontalface_alt.xml";
     "haarCascade_openCV/haarcascade_frontalface_alt2.xml";
 
