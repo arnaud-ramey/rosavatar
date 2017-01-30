@@ -1,13 +1,23 @@
 <launch>
+
+<!-- mouse position to face coords -->
+<remap from="win2point/out" to="/avatar/iris_position"/>
+<node pkg="rosavatar" type="win2point.exe" name="win2point"  output="screen" respawn="true"/>
+
+<!-- mic volume monitor -->
+<remap from="/systemSoundLevel" to="/avatar/mouth_vol" />
+<node pkg="rospavumeter" type="vumeter.exe" name="micmon"
+      args="_record:=false"/>
+
+<!-- avatar -->
 <node pkg="rosavatar" type="rosavatar.exe" name="avatar" output="screen" respawn="true"
-      args=""/>
-<!--
       args="_eyes_folder:=$(find rosavatar)/third_parties/avatar/data/mini_eyes"/>
+<!--
+      args=""/>
 -->
 
+<!-- show avatar with image_view -->
 <node pkg="image_view" type="image_view"   name="avatar_viewer" output="screen" respawn="true"
       args="image:=/avatar/eyes"/>
 
-<remap from="win2point/out" to="/avatar/iris_position"/>
-<node pkg="rosavatar" type="win2point.exe" name="win2point"  output="screen" respawn="true"/>
 </launch>

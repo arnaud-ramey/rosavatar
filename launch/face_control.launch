@@ -1,12 +1,12 @@
 <launch>
 <!-- camera node -->
-<remap from="image_raw" to="rgb"/>
-<node name="uvc_cam" pkg="uvc_camera" type="uvc_camera_node"
-    output="screen" respawn="false" >
-  <param name="device" value="/dev/video0" /> <!-- the device to use -->
-  <param name="width" value="320" />
-  <param name="height" value="240" />
-  <param name="fps" value="30" /> <!-- frames per second -->
+<!-- as of 30/012017, usb_cam does not compile and uvc_cam is obsolete. -->
+<remap from="/cam_node/image_raw" to="rgb"/>
+<node pkg="cv_camera" type="cv_camera_node" name="cam_node" output="screen">
+  <param name="device_d" value="0" /> <!-- the device to use -->
+  <param name="image_width" value="320" />
+  <param name="image_height" value="240" />
+    <param name="rate" value="30" /> <!-- frames per second -->
 </node>
 
 <!-- rgb image to face coords -->
@@ -15,12 +15,19 @@
 <node pkg="rosavatar" type="face2point.exe" name="face2point"  output="screen" respawn="true"
       args="_display:=true" />
 
+<!-- mic volume monitor -->
+<remap from="/systemSoundLevel" to="/avatar/mouth_vol" />
+<node pkg="rospavumeter" type="vumeter.exe" name="micmon"
+      args="_record:=false"/>
+
+<!-- avatar -->
 <node pkg="rosavatar" type="rosavatar.exe" name="avatar" output="screen" respawn="true"
-      args=""/>
-<!--
       args="_eyes_folder:=$(find rosavatar)/third_parties/avatar/data/mini_eyes"/>
+<!--
+      args=""/>
 -->
 
+<!-- show avatar with image_view -->
 <node pkg="image_view" type="image_view"   name="avatar_viewer" output="screen" respawn="true"
       args="image:=/avatar/eyes"/>
 </launch>

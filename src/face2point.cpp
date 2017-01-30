@@ -41,21 +41,25 @@ Transform faces in the camera image into directions for the eyes.
     [std_msgs/String]
     State. Sad if nobody around, normal otherwise.
  */
-#include "rosavatar/opencv_face_detector.h"
 // opencv
 #include <opencv2/highgui/highgui.hpp>
 // ROS
 #include <geometry_msgs/Point.h>
-#include <sensor_msgs/image_encodings.h>
-#include <std_msgs/String.h>
 #include <image_transport/image_transport.h>
+#include <sensor_msgs/image_encodings.h>
+#include <ros/package.h>
+#include <std_msgs/String.h>
+// rosavatar
+#include "rosavatar/opencv_face_detector.h"
 
 class Face2Point {
 public:
   static const unsigned int QUEUE_SIZE = 3;
 
   Face2Point() : _nh_private("~"), _it(_nh_public) {
-    _classifier = image_utils::create_face_classifier();
+    std::string xmlpath = ros::package::getPath("rosavatar")
+        + "/data/haarcascade_frontalface_alt2.xml";
+    _classifier = image_utils::create_face_classifier(xmlpath);
     // params
     _nh_private.param("display", _display, false);
     // publishers and subscribers

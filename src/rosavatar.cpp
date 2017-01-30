@@ -19,31 +19,10 @@ Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ________________________________________________________________________________
-
-\todo Description of the file
-
-\section Parameters
-  - \b "~eyes_folder"
-    [std::string, default:""]
-    Folder where the different images can be found.
-    Leave empty for the default face.
-
-\section Subscriptions
-  - \b "~iris_position"
-    [geometry_msgs/Point]
-    Output topic, containing the normalized coordinates of
-
-  - \b "~state"
-    [std_msgs/String]
-    State. Sad if nobody around, normal otherwise.
-
-\section Publications
-  - \b "~eyes"
-    [sensors_msgs/Image]
-    Generated avatar image.
  */
 #include <ros/ros.h>
 #include <std_msgs/String.h>
+#include <std_msgs/Float64.h>
 #include <geometry_msgs/Point.h>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
@@ -56,18 +35,26 @@ public:
     // get params
     std::string eyes_folder = "";
     nh_private.param("eyes_folder", eyes_folder, eyes_folder);
-    if (!_eye.load_imgs(eyes_folder)) {
+    if (!load_default_avatar(eyes_folder)) {
       ROS_FATAL("Could not load eyes folder '%s'\n", eyes_folder.c_str());
       ros::shutdown();
     }
+    // set leds to turn on according to volume and position
+    unsigned int nleds = _leds.size(), ledw = nleds / 2;
+    for (unsigned int i = 0; i < nleds; ++i) {
+      double thres = 1. * abs(i - ledw) / (ledw+1);
+      ROS_INFO("Led %i: setting auto mode at %g.", i, thres);
+      _leds[i].set_auto_mode(thres);
+    } // end for i
     // create subscribers
-    iris_pos_sub = nh_private.subscribe("iris_position", 1, &RosAvatar::iris_pos_cb, this);
-    state_sub = nh_private.subscribe("state", 1, &RosAvatar::state_cb, this);
+    _iris_pos_sub = nh_private.subscribe("iris_position", 1, &RosAvatar::iris_pos_cb, this);
+    _mouth_vol_sub = nh_private.subscribe("mouth_vol", 1, &RosAvatar::mouth_vol_cb, this);
+    _state_sub = nh_private.subscribe("state", 1, &RosAvatar::state_cb, this);
     // create publishers
     img_pub = nh_private.advertise<sensor_msgs::Image>("eyes", 1);
     bridge.encoding = sensor_msgs::image_encodings::BGR8;
     ROS_INFO("rosavatar: getting iris on '%s', state on '%s', publishing image on '%s'",
-             iris_pos_sub.getTopic().c_str(), state_sub.getTopic().c_str(),
+             _iris_pos_sub.getTopic().c_str(), _state_sub.getTopic().c_str(),
              img_pub.getTopic().c_str());
   }
 
@@ -93,8 +80,15 @@ private:
     _eye.set_state(msg->data);
   }
 
+  void mouth_vol_cb(const std_msgs::Float64ConstPtr & msg) {
+    // printf("mouth_vol_cb()\n");
+    unsigned int nleds = _leds.size();
+    for (unsigned int i = 0; i < nleds; ++i)
+      _leds[i].set_auto_mode_value(msg->data);
+  }
+
   ros::NodeHandle nh_public, nh_private;
-  ros::Subscriber iris_pos_sub, state_sub;
+  ros::Subscriber _iris_pos_sub, _state_sub, _mouth_vol_sub;
   ros::Publisher img_pub;
   cv_bridge::CvImage bridge;
 }; // end class RosAvatar
@@ -102,7 +96,7 @@ private:
 int main(int argc, char** argv) {
   ros::init(argc, argv, "rosavatar");
   RosAvatar avatar;
-  ros::Rate rate(50);
+  ros::Rate rate(20);
   while (ros::ok()) {
     ros::spinOnce();
     avatar.refresh();
