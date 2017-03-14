@@ -30,32 +30,64 @@ A GUI for moving eyes.
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <geometry_msgs/Point.h>
+#include <std_msgs/String.h>
 #include <ros/ros.h>
-ros::Publisher point_pub;
-int h = 100;
-geometry_msgs::Point pt;
 
-void mouse_cb(int /*event*/, int x, int y, int /*flags*/, void* /*userdata*/) {
+ros::Publisher point_pub, state_pub;
+std::string win_name = "win2point";
+int h = 100;
+cv::Mat3b gui(h, h);
+geometry_msgs::Point pt;
+std::vector<std::string> states;
+unsigned int state_idx = 0, nstates;
+
+void redraw() {
+  gui.setTo(cv::Vec3b(255, 255, 255));
+  cv::circle(gui, cv::Point(h/2,h/2), h/2, CV_RGB(0,0,0), 1);
+  cv::putText(gui, "Mouse here", cv::Point(4, h/2), cv::FONT_HERSHEY_PLAIN,
+              1, CV_RGB(0,0,0));
+  cv::putText(gui, states[state_idx], cv::Point(4, 2 * h / 3), cv::FONT_HERSHEY_PLAIN,
+              1, CV_RGB(0,0,0));
+  cv::imshow(win_name, gui);
+  // publish new state
+  std_msgs::String state_msg;
+  state_msg.data = states[state_idx];
+  state_pub.publish(state_msg);
+}
+
+void mouse_cb(int event, int x, int y, int /*flags*/, void* /*userdata*/) {
   //printf("mouse_cb:x:%i, y:%i\n", x, y);
   pt.x = 2. * x / h - 1;
   pt.y = 2. * y / h - 1;
   point_pub.publish(pt);
-}
+  if (event == CV_EVENT_LBUTTONDOWN) {
+    state_idx = (state_idx+1) % nstates;
+    redraw();
+  }
+  else if (event == CV_EVENT_RBUTTONDOWN) {
+    state_idx = (state_idx+nstates-1) % nstates;
+    redraw();
+  }
+} // end mouse_cb();
 
 int main(int argc, char** argv) {
-  std::string win_name = "win2point";
   ros::init(argc, argv, win_name);
   ros::NodeHandle nh_private("~");
-  cv::Mat3b gui(h, h);
-  gui.setTo(cv::Vec3b(255, 255, 255));
-  cv::circle(gui, cv::Point(h/2,h/2), h/2, CV_RGB(0,0,0), 1);
-  cv::putText(gui, "Mouse here", cv::Point(5, h/2), cv::FONT_HERSHEY_PLAIN,
-              1, CV_RGB(0,0,0));
-  point_pub = nh_private.advertise<geometry_msgs::Point>("out", 1);
+  point_pub = nh_private.advertise<geometry_msgs::Point>("point", 1);
+  state_pub = nh_private.advertise<std_msgs::String>("state", 1);
+  states.push_back("angry");
+  states.push_back("laughing");
+  states.push_back("normal");
+  states.push_back("sad");
+  states.push_back("sleeping");
+  states.push_back("sleepy");
+  states.push_back("surprised");
+  nstates = states.size();
+  printf("win2point: emitting Point to '%s', state to '%s'\n",
+         point_pub.getTopic().c_str(), state_pub.getTopic().c_str());
   cv::namedWindow(win_name);
   cv::setMouseCallback(win_name, mouse_cb, NULL);
-  printf("win2point: emitting Point to '%s'\n", point_pub.getTopic().c_str());
-  cv::imshow(win_name, gui);
+  redraw();
 
   while (ros::ok()) {
     ros::spinOnce();

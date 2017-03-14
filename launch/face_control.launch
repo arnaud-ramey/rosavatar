@@ -29,5 +29,5 @@
 
 <!-- show avatar with image_view -->
 <node pkg="image_view" type="image_view"   name="avatar_viewer" output="screen" respawn="true"
-      args="image:=/avatar/eyes"/>
+      args="image:=/avatar/avatar_image"/>
 </launch>

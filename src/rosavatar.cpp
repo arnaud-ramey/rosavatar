@@ -33,15 +33,23 @@ class RosAvatar : public Avatar {
 public:
   RosAvatar() : Avatar(), nh_private("~") {
     // get params
-    std::string eyes_folder = "";
+    int nleds = 5, bg_r = 0, bg_g = 0, bg_b = 0;
+    std::string eyes_folder = "", led_prefix = "";
+    nh_private.param("led_prefix", led_prefix, led_prefix);
     nh_private.param("eyes_folder", eyes_folder, eyes_folder);
-    if (!load_default_avatar(eyes_folder)) {
-      ROS_FATAL("Could not load eyes folder '%s'\n", eyes_folder.c_str());
+    nh_private.param("nleds", nleds, nleds);
+    nh_private.param("bg_r", bg_r, bg_r);
+    nh_private.param("bg_g", bg_g, bg_g);
+    nh_private.param("bg_b", bg_b, bg_b);
+    if (!load_default_avatar(eyes_folder, led_prefix, nleds,
+                             bg_r, bg_g, bg_b)) {
+      ROS_FATAL("Could not load avatar with eyes '%s' and LEDs '%s'\n",
+                eyes_folder.c_str(), led_prefix.c_str());
       ros::shutdown();
     }
     // set leds to turn on according to volume and position
-    unsigned int nleds = _leds.size(), ledw = nleds / 2;
-    for (unsigned int i = 0; i < nleds; ++i) {
+    unsigned int ledw = nleds / 2;
+    for (int i = 0; i < nleds; ++i) {
       double thres = 1. * abs(i - ledw) / (ledw+1);
       ROS_INFO("Led %i: setting auto mode at %g.", i, thres);
       _leds[i].set_auto_mode(thres);
@@ -51,7 +59,7 @@ public:
     _mouth_vol_sub = nh_private.subscribe("mouth_vol", 1, &RosAvatar::mouth_vol_cb, this);
     _state_sub = nh_private.subscribe("state", 1, &RosAvatar::state_cb, this);
     // create publishers
-    img_pub = nh_private.advertise<sensor_msgs::Image>("eyes", 1);
+    img_pub = nh_private.advertise<sensor_msgs::Image>("avatar_image", 1);
     bridge.encoding = sensor_msgs::image_encodings::BGR8;
     ROS_INFO("rosavatar: getting iris on '%s', state on '%s', publishing image on '%s'",
              _iris_pos_sub.getTopic().c_str(), _state_sub.getTopic().c_str(),
