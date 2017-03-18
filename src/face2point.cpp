@@ -49,8 +49,9 @@ Transform faces in the camera image into directions for the eyes.
 #include <sensor_msgs/image_encodings.h>
 #include <ros/package.h>
 #include <std_msgs/String.h>
+#include <cv_bridge/cv_bridge.h>
 // rosavatar
-#include "rosavatar/opencv_face_detector.h"
+#include "vision_utils/opencv_face_detector.h"
 
 class Face2Point {
 public:
@@ -59,7 +60,7 @@ public:
   Face2Point() : _nh_private("~"), _it(_nh_public) {
     std::string xmlpath = ros::package::getPath("rosavatar")
         + "/data/haarcascade_frontalface_alt2.xml";
-    _classifier = image_utils::create_face_classifier(xmlpath);
+    _classifier = vision_utils::create_face_classifier(xmlpath);
     // params
     _nh_private.param("display", _display, false);
     // publishers and subscribers
@@ -84,7 +85,7 @@ protected:
 
   /*! where the real image processing work is done. */
   virtual void process_rgb(const cv::Mat3b & rgb) {
-    image_utils::detect_with_opencv
+    vision_utils::detect_with_opencv
         (rgb, _classifier, _small_rgb, _faces);
     geometry_msgs::Point pt;
     std_msgs::String state;
