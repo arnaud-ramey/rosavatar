@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<background width="800" height="600" r="150" g="150" b="150"/>
+<eye folder="$(find rosavatar)/third_parties/avatar/data/mini_eyes">
+  <center x="300" y="200" flip="0"/>
+  <center x="500" y="200" flip="1"/>
+</eye>
+
+<!-- nose -->
+<led center_pos_x="400" center_pos_y="300" auto_mode_threshold="0.1"
+     folder="$(find rosavatar)/third_parties/avatar/data/leds/white" />
+
+<!-- mouth -->
+<led center_pos_x="200" center_pos_y="400" auto_mode_threshold="0.8"
+     folder="$(find rosavatar)/third_parties/avatar/data/leds/blue" />
+<led center_pos_x="300" center_pos_y="470" auto_mode_threshold="0.6"
+     folder="$(find rosavatar)/third_parties/avatar/data/leds/blue" />
+<led center_pos_x="400" center_pos_y="500" auto_mode_threshold="0.4"
+     folder="$(find rosavatar)/third_parties/avatar/data/leds/blue" />
+<led center_pos_x="500" center_pos_y="470" auto_mode_threshold="0.6"
+     folder="$(find rosavatar)/third_parties/avatar/data/leds/blue" />
+<led center_pos_x="600" center_pos_y="400" auto_mode_threshold="0.8"
+     folder="$(find rosavatar)/third_parties/avatar/data/leds/blue" />

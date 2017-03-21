@@ -12,12 +12,10 @@
 
 <!-- avatar -->
 <node pkg="rosavatar" type="rosavatar.exe" name="avatar" output="screen" respawn="true">
-  <param name="eyes_folder" value="$(find rosavatar)/third_parties/avatar/data/mini_eyes"/>
-  <param name="led_prefix" value="$(find rosavatar)/third_parties/avatar/data/leds/blue"/>
-  <param name="nleds" value="9" />
-  <param name="bg_r" value="255" />
-  <param name="bg_g" value="255" />
-  <param name="bg_b" value="255" />
+  <param name="xml_file" value="$(find rosavatar)/data/avatar_octopus.xml"/>
+<!--
+  <param name="xml_file" value="$(find rosavatar)/data/avatar_mini.xml"/>
+-->
 </node>
 
 <!-- show avatar with image_view -->

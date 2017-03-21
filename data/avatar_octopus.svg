@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="800"
+   height="600"
+   viewBox="0 0 800 600.00005"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="avatar_octopus.svg">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#20ff16"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1"
+     inkscape:cx="422.54102"
+     inkscape:cy="297.786"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="0"
+     inkscape:window-width="1366"
+     inkscape:window-height="768"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     units="px"
+     inkscape:snap-global="0" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-452.36197)">
+    <g
+       id="g4249"
+       transform="matrix(1,0,0,-1,-4.6704102e-6,1506.0939)">
+      <image
+         width="32"
+         height="32.000004"
+         preserveAspectRatio="none"
+         xlink:href="file:///home/arnaud/catkin_ws/src/rosavatar/third_parties/avatar/data/leds/white_on.png"
+         id="image4162"
+         x="631.03351"
+         y="915.57751"
+         sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/third_parties/avatar/data/leds/white_on.png" />
+      <g
+         transform="translate(27.66665,0)"
+         id="g4181">
+        <image
+           sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/data/../third_parties/avatar/data/mini_eyes/bg.png"
+           xlink:href="../third_parties/avatar/data/mini_eyes/bg.png"
+           y="564.51636"
+           x="236"
+           id="image4144"
+           preserveAspectRatio="none"
+           height="128"
+           width="128" />
+        <image
+           sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/data/../third_parties/avatar/data/mini_eyes/bg.png"
+           xlink:href="../third_parties/avatar/data/mini_eyes/bg.png"
+           width="128"
+           height="128"
+           preserveAspectRatio="none"
+           id="image4146"
+           x="236"
+           y="724.51636" />
+      </g>
+      <g
+         transform="translate(30.3333,0)"
+         id="g4185">
+        <image
+           sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/data/../third_parties/avatar/data/mini_eyes/bg.png"
+           xlink:href="../third_parties/avatar/data/mini_eyes/bg.png"
+           width="128"
+           height="128"
+           preserveAspectRatio="none"
+           id="image4165"
+           x="378"
+           y="564.51636" />
+        <image
+           sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/data/../third_parties/avatar/data/mini_eyes/bg.png"
+           xlink:href="../third_parties/avatar/data/mini_eyes/bg.png"
+           y="724.51636"
+           x="378"
+           id="image4167"
+           preserveAspectRatio="none"
+           height="128"
+           width="128" />
+      </g>
+      <g
+         transform="translate(34.999995,0)"
+         id="g4189">
+        <image
+           sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/data/../third_parties/avatar/data/mini_eyes/bg.png"
+           xlink:href="../third_parties/avatar/data/mini_eyes/bg.png"
+           y="484.51636"
+           x="518"
+           id="image4169"
+           preserveAspectRatio="none"
+           height="128"
+           width="128" />
+        <image
+           sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/data/../third_parties/avatar/data/mini_eyes/bg.png"
+           xlink:href="../third_parties/avatar/data/mini_eyes/bg.png"
+           width="128"
+           height="128"
+           preserveAspectRatio="none"
+           id="image4171"
+           x="518"
+           y="644.51636" />
+      </g>
+      <g
+         transform="translate(34.999992,0)"
+         id="g4177">
+        <image
+           sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/data/../third_parties/avatar/data/mini_eyes/bg.png"
+           xlink:href="../third_parties/avatar/data/mini_eyes/bg.png"
+           width="128"
+           height="128"
+           preserveAspectRatio="none"
+           id="image4173"
+           x="84"
+           y="484.51636" />
+        <image
+           sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/data/../third_parties/avatar/data/mini_eyes/bg.png"
+           xlink:href="../third_parties/avatar/data/mini_eyes/bg.png"
+           y="644.51636"
+           x="84"
+           id="image4175"
+           preserveAspectRatio="none"
+           height="128"
+           width="128" />
+      </g>
+      <image
+         sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/third_parties/avatar/data/leds/white_on.png"
+         y="925.57751"
+         x="558.97003"
+         id="image4219"
+         xlink:href="file:///home/arnaud/catkin_ws/src/rosavatar/third_parties/avatar/data/leds/white_on.png"
+         preserveAspectRatio="none"
+         height="32.000004"
+         width="32" />
+      <image
+         width="32"
+         height="32.000004"
+         preserveAspectRatio="none"
+         xlink:href="file:///home/arnaud/catkin_ws/src/rosavatar/third_parties/avatar/data/leds/white_on.png"
+         id="image4221"
+         x="486.90652"
+         y="925.57751"
+         sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/third_parties/avatar/data/leds/white_on.png" />
+      <image
+         sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/third_parties/avatar/data/leds/white_on.png"
+         y="935.57751"
+         x="414.84302"
+         id="image4223"
+         xlink:href="file:///home/arnaud/catkin_ws/src/rosavatar/third_parties/avatar/data/leds/white_on.png"
+         preserveAspectRatio="none"
+         height="32.000004"
+         width="32" />
+      <image
+         width="32"
+         height="32.000004"
+         preserveAspectRatio="none"
+         xlink:href="file:///home/arnaud/catkin_ws/src/rosavatar/third_parties/avatar/data/leds/white_on.png"
+         id="image4225"
+         x="342.77951"
+         y="935.57751"
+         sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/third_parties/avatar/data/leds/white_on.png" />
+      <image
+         sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/third_parties/avatar/data/leds/white_on.png"
+         y="925.57751"
+         x="270.716"
+         id="image4227"
+         xlink:href="file:///home/arnaud/catkin_ws/src/rosavatar/third_parties/avatar/data/leds/white_on.png"
+         preserveAspectRatio="none"
+         height="32.000004"
+         width="32" />
+      <image
+         width="32"
+         height="32.000004"
+         preserveAspectRatio="none"
+         xlink:href="file:///home/arnaud/catkin_ws/src/rosavatar/third_parties/avatar/data/leds/white_on.png"
+         id="image4229"
+         x="198.65248"
+         y="925.57751"
+         sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/third_parties/avatar/data/leds/white_on.png" />
+      <image
+         sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/third_parties/avatar/data/leds/white_on.png"
+         y="915.57751"
+         x="126.58899"
+         id="image4231"
+         xlink:href="file:///home/arnaud/catkin_ws/src/rosavatar/third_parties/avatar/data/leds/white_on.png"
+         preserveAspectRatio="none"
+         height="32.000004"
+         width="32" />
+      <image
+         width="32"
+         height="32.000004"
+         preserveAspectRatio="none"
+         xlink:href="file:///home/arnaud/catkin_ws/src/rosavatar/third_parties/avatar/data/leds/white_on.png"
+         id="image4233"
+         x="54.52549"
+         y="915.57751"
+         sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/third_parties/avatar/data/leds/white_on.png" />
+      <image
+         sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/third_parties/avatar/data/leds/white_on.png"
+         y="915.57751"
+         x="703.09698"
+         id="image4235"
+         xlink:href="file:///home/arnaud/catkin_ws/src/rosavatar/third_parties/avatar/data/leds/white_on.png"
+         preserveAspectRatio="none"
+         height="32.000004"
+         width="32" />
+      <image
+         sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/third_parties/avatar/data/leds/white_on.png"
+         y="971.57751"
+         x="486.90652"
+         id="image4239"
+         xlink:href="file:///home/arnaud/catkin_ws/src/rosavatar/third_parties/avatar/data/leds/white_on.png"
+         preserveAspectRatio="none"
+         height="32.000004"
+         width="32" />
+      <image
+         width="32"
+         height="32.000004"
+         preserveAspectRatio="none"
+         xlink:href="file:///home/arnaud/catkin_ws/src/rosavatar/third_parties/avatar/data/leds/white_on.png"
+         id="image4241"
+         x="414.84302"
+         y="989.57751"
+         sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/third_parties/avatar/data/leds/white_on.png" />
+      <image
+         sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/third_parties/avatar/data/leds/white_on.png"
+         y="989.57751"
+         x="342.77951"
+         id="image4243"
+         xlink:href="file:///home/arnaud/catkin_ws/src/rosavatar/third_parties/avatar/data/leds/white_on.png"
+         preserveAspectRatio="none"
+         height="32.000004"
+         width="32" />
+      <image
+         width="32"
+         height="32.000004"
+         preserveAspectRatio="none"
+         xlink:href="file:///home/arnaud/catkin_ws/src/rosavatar/third_parties/avatar/data/leds/white_on.png"
+         id="image4245"
+         x="270.716"
+         y="971.57751"
+         sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/third_parties/avatar/data/leds/white_on.png" />
+    </g>
+  </g>
+</svg>

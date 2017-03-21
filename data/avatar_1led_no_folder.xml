@@ -1,5 +1,3 @@
 <?xml version="1.0"?>
 <background width="1600" height="1200" r="10" g="20" b="30"/>
-<eye folder="/foo">
-  <center x="100" y="100" flip="0"/>
-</eye>
+<led center_pos_x="100" center_pos_y="100" auto_mode_threshold="0.5" />

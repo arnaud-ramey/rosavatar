@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<background width="1600" height="1200" r="150" g="150" b="150"/>
+<led center_pos_x="100" center_pos_y="200" auto_mode_threshold="0.5"/>
+<eye>
+  <center x="100" y="100" flip="0"/>
+  <center x="200" y="100" flip="0"/>
+</eye>
+<led center_pos_x="200" center_pos_y="200"/>

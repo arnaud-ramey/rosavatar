@@ -1,6 +1,7 @@
 #ifndef ROSAVATAR_H
 #define ROSAVATAR_H
 #include <ros/ros.h>
+#include <ros/package.h>
 #include <std_msgs/String.h>
 #include <std_msgs/Float64.h>
 #include <geometry_msgs/Point.h>
@@ -10,14 +11,30 @@
 #include "avatar/avatar.h"
 #include "vision_utils/XmlDocument.h"
 
+std::string replace_find_tags(const std::string & path) {
+  std::string out = path, pattern_begin = "$(find ", pattern_end = ")";
+  size_t begin = 0, end = 0, pbs = pattern_begin.size();
+  while(true) {
+    begin = out.find(pattern_begin, begin);
+    end   = out.find(pattern_end, begin);
+    if (begin == std::string::npos || end == std::string::npos)
+      return out;
+    std::string pkgname = out.substr(begin+pbs, end-begin-pbs);
+    //printf("pkgname:'%s'\n", pkgname.c_str());
+    std::string pkgpath = ros::package::getPath(pkgname);
+    out.replace(begin, end-begin+1, pkgpath);
+    begin += pkgpath.length();
+  }
+}
+
 class XmlAvatar : public Avatar {
 public:
   typedef vision_utils::XmlDocument::Node Node;
 
-  bool from_file(const std::string & filename) {
+  bool from_xml_file(const std::string & filename) {
     clear();
     vision_utils::XmlDocument doc;
-    if (!doc.load_from_file(filename))
+    if (!doc.load_from_file(replace_find_tags(filename)))
       return false;
     // get background property
     Node* bg = doc.get_node_at_direction(doc.root(), "background");
@@ -32,21 +49,55 @@ public:
     int h = doc.get_node_attribute(bg, "height", 480);
     _bg_color = CV_RGB(r, g, b);
     _bg.create(h, w);
-    _bg.setTo(cv::Vec3b(_bg_color[2], _bg_color[1], _bg_color[0]));
+    _bg.setTo(cv::Vec3b(_bg_color[0], _bg_color[1], _bg_color[2]));
     _bg.copyTo(_avatar);
+
     // get eye nodes
-    std::vector<Node*> eye_nodes;
+    std::vector<Node*> eye_nodes, center_nodes;
     doc.get_all_nodes_at_direction(doc.root(), "eye", eye_nodes);
     for (unsigned int i = 0; i < eye_nodes.size(); ++i) {
       Node* eye_node = eye_nodes[i];
-      std::string folder = doc.get_node_attribute(eye_node, "folder", "");
-      int center_pos_x = doc.get_node_attribute(eye_node, "center_pos_x", 0);
-      int center_pos_y = doc.get_node_attribute(eye_node, "center_pos_y", 0);
-      bool flip = doc.get_node_attribute(eye_node, "flip", false);
+      std::string folder = doc.get_node_attribute(eye_node, "folder");
       Eye eye;
-      if (!folder.empty() && !eye.load_imgs(folder)) // load eye imgs if needed
+      DEBUG_PRINT("Eye folder:'%s'\n", folder.c_str());
+      // load eye imgs if needed
+      if (folder.empty() && !eye.load_default_imgs())
         return false;
-      if (!add_eye(eye, cv::Point(center_pos_x, center_pos_y), flip))
+      else if (!eye.load_imgs(replace_find_tags(folder)))
+        return false;
+      std::vector<cv::Point> eye_centers;
+      std::vector<bool> eye_flips;
+      doc.get_all_nodes_at_direction(eye_node, "center", center_nodes);
+      for (unsigned int j = 0; j < center_nodes.size(); ++j) {
+        Node* center_node = center_nodes[j];
+        int x = doc.get_node_attribute(center_node, "x", 0);
+        int y = doc.get_node_attribute(center_node, "y", 0);
+        bool flip = doc.get_node_attribute(center_node, "flip", false);
+        eye_centers.push_back(cv::Point(x, y));
+        eye_flips.push_back(flip);
+      } // end for j
+      if (!add_eye(eye, eye_centers, eye_flips))
+        return false;
+    } // end for i
+
+    // get led nodes
+    std::vector<Node*> led_nodes;
+    doc.get_all_nodes_at_direction(doc.root(), "led", led_nodes);
+    for (unsigned int i = 0; i < led_nodes.size(); ++i) {
+      Node* led_node = led_nodes[i];
+      std::string folder = doc.get_node_attribute(led_node, "folder");
+      int center_pos_x = doc.get_node_attribute(led_node, "center_pos_x", 0);
+      int center_pos_y = doc.get_node_attribute(led_node, "center_pos_y", 0);
+      bool has_auto_mode = doc.has_node_attribute(led_node, "auto_mode_threshold");
+      double auto_mode_threshold = doc.get_node_attribute(led_node, "auto_mode_threshold", -1.0);
+      Led led;
+      DEBUG_PRINT("Led folder:'%s'\n", folder.c_str());
+      // load led imgs if needed
+      if (!folder.empty() && !led.load_imgs(replace_find_tags(folder)))
+        return false;
+      if (has_auto_mode)
+        led.set_auto_mode(auto_mode_threshold);
+      if (!add_led(led, cv::Point(center_pos_x, center_pos_y)))
         return false;
     } // end for i
     return true; // success
@@ -58,27 +109,12 @@ class RosAvatar : public XmlAvatar {
 public:
   RosAvatar() : XmlAvatar(), nh_private("~") {
     // get params
-    //    int nleds = 5, bg_r = 0, bg_g = 0, bg_b = 0;
-    //    std::string eyes_folder = "", led_prefix = "";
-    //    nh_private.param("led_prefix", led_prefix, led_prefix);
-    //    nh_private.param("eyes_folder", eyes_folder, eyes_folder);
-    //    nh_private.param("nleds", nleds, nleds);
-    //    nh_private.param("bg_r", bg_r, bg_r);
-    //    nh_private.param("bg_g", bg_g, bg_g);
-    //    nh_private.param("bg_b", bg_b, bg_b);
-    //    if (!load_default_avatar(eyes_folder, led_prefix, nleds,
-    //                             bg_r, bg_g, bg_b)) {
-    //      ROS_FATAL("Could not load avatar with eyes '%s' and LEDs '%s'\n",
-    //                eyes_folder.c_str(), led_prefix.c_str());
-    //      ros::shutdown();
-    //    }
-    //    // set leds to turn on according to volume and position
-    //    unsigned int ledw = nleds / 2;
-    //    for (int i = 0; i < nleds; ++i) {
-    //      double thres = 1. * abs(i - ledw) / (ledw+1);
-    //      ROS_INFO("Led %i: setting auto mode at %g.", i, thres);
-    //      _leds[i].set_auto_mode(thres);
-    //    } // end for i
+    std::string xml_file = "";
+    nh_private.param("xml_file", xml_file, xml_file);
+    if (xml_file.empty())
+      load_default_avatar();
+    else
+      from_xml_file(xml_file);
     // create subscribers
     _iris_pos_sub = nh_private.subscribe("iris_position", 1, &RosAvatar::iris_pos_cb, this);
     _mouth_vol_sub = nh_private.subscribe("mouth_vol", 1, &RosAvatar::mouth_vol_cb, this);
@@ -109,14 +145,13 @@ private:
   }
 
   void state_cb(const std_msgs::StringConstPtr & msg) {
-    // printf("state_cb()\n");
-    _eye.set_state(msg->data);
+    for (unsigned int i = 0; i < neyes(); ++i)
+      _eyes[i].set_state(msg->data);
   }
 
   void mouth_vol_cb(const std_msgs::Float64ConstPtr & msg) {
     // printf("mouth_vol_cb()\n");
-    unsigned int nleds = _leds.size();
-    for (unsigned int i = 0; i < nleds; ++i)
+    for (unsigned int i = 0; i < nleds(); ++i)
       _leds[i].set_auto_mode_value(msg->data);
   }
 

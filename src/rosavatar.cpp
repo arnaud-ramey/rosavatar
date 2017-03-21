@@ -25,7 +25,7 @@ ________________________________________________________________________________
 int main(int argc, char** argv) {
   ros::init(argc, argv, "rosavatar");
   RosAvatar avatar;
-  ros::Rate rate(20);
+  ros::Rate rate(15);
   while (ros::ok()) {
     ros::spinOnce();
     avatar.refresh();
