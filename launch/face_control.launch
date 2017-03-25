@@ -21,11 +21,9 @@
       args="_record:=false"/>
 
 <!-- avatar -->
-<node pkg="rosavatar" type="rosavatar.exe" name="avatar" output="screen" respawn="true"
-      args="_eyes_folder:=$(find rosavatar)/third_parties/avatar/data/mini_eyes"/>
-<!--
-      args=""/>
--->
+<node pkg="rosavatar" type="rosavatar.exe" name="avatar" output="screen" respawn="true">
+  <param name="xml_file" value="$(find rosavatar)/data/avatar_octopus.xml"/>
+</node>
 
 <!-- show avatar with image_view -->
 <node pkg="image_view" type="image_view"   name="avatar_viewer" output="screen" respawn="true"

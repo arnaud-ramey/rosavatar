@@ -8,13 +8,12 @@
  */
 
 #include <gtest/gtest.h>
-#include <ros/package.h>
 #include <rosavatar/rosavatar.h>
 
 std::string datafolder() { return ros::package::getPath("rosavatar") + "/data/"; }
 
 void test_tags(const std::string & in, const std::string & exp) {
-  std::string out = replace_find_tags(in);
+  std::string out = vision_utils::replace_find_tags(in);
   ASSERT_TRUE(out == exp) << "out:" << out << ", exp:" << exp;
 }
 
@@ -28,122 +27,133 @@ TEST(TestSuite, rosavatar2) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-
 TEST(TestSuite, load_non_existing) {
-  XmlAvatar xml_avatar;
-  ASSERT_TRUE(xml_avatar.get_bg_color() == cv::Scalar(0,0,0));
-  ASSERT_FALSE(xml_avatar.from_xml_file("/error.xml"));
+  SDLAvatar avatar;
+  ASSERT_TRUE(avatar.init());
+  ASSERT_TRUE(avatar.get_bg_color() == SDL_Color_ctor(0,0,0));
+  ASSERT_FALSE(avatar.from_xml_file("/error.xml"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST(TestSuite, avatar_empty) {
-  XmlAvatar xml_avatar;
-  ASSERT_FALSE(xml_avatar.from_xml_file(datafolder() + "avatar_empty.xml"));
+  SDLAvatar avatar;
+  ASSERT_FALSE(avatar.from_xml_file(datafolder() + "avatar_empty.xml"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST(TestSuite, avatar_wh) {
-  XmlAvatar xml_avatar;
-  ASSERT_TRUE(xml_avatar.from_xml_file(datafolder() + "avatar_empty_wh.xml"));
-  ASSERT_TRUE(xml_avatar.get_bg_color() == cv::Scalar(30,20,10));
-  ASSERT_TRUE(xml_avatar.get_avatar_size() == cv::Size(1600,1200));
-  ASSERT_TRUE(xml_avatar.redraw());
-  cv::Mat3b avatar;
-  xml_avatar.get_avatar().copyTo(avatar);
-  ASSERT_TRUE(avatar.size() == xml_avatar.get_avatar_size());
-  ASSERT_TRUE(avatar.at<cv::Vec3b>(0,0) ==  cv::Vec3b(30,20,10))
-      << avatar.at<cv::Vec3b>(0,0);
+  SDLAvatar avatar;
+  ASSERT_TRUE(avatar.from_xml_file(datafolder() + "avatar_empty_wh.xml"));
+  ASSERT_TRUE(avatar.get_bg_color() == SDL_Color_ctor(10,20,30));
+  ASSERT_TRUE(avatar.render());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST(TestSuite, avatar_1eye_no_folder) {
-  XmlAvatar xml_avatar;
-  ASSERT_TRUE(xml_avatar.from_xml_file(datafolder() + "avatar_1eye_no_folder.xml"));
-  ASSERT_TRUE(xml_avatar.neyes() == 1) << "neyes:" << xml_avatar.neyes();
-  ASSERT_TRUE(xml_avatar.redraw());
+  SDLAvatar avatar;
+  ASSERT_TRUE(avatar.from_xml_file(datafolder() + "avatar_1eye_no_folder.xml"));
+  ASSERT_TRUE(avatar.neyes() == 1) << "neyes:" << avatar.neyes();
+  ASSERT_TRUE(avatar.render());
 }
 TEST(TestSuite, avatar_1eye_bad_folder) {
-  XmlAvatar xml_avatar;
-  ASSERT_TRUE(xml_avatar.from_xml_file(datafolder() + "avatar_1eye_bad_folder.xml"));
-  ASSERT_TRUE(xml_avatar.neyes() == 1) << "neyes:" << xml_avatar.neyes();
-  ASSERT_TRUE(xml_avatar.redraw());
+  SDLAvatar avatar;
+  ASSERT_FALSE(avatar.from_xml_file(datafolder() + "avatar_1eye_bad_folder.xml"));
 }
 TEST(TestSuite, avatar_1eye_good_folder) {
-  XmlAvatar xml_avatar;
-  ASSERT_TRUE(xml_avatar.from_xml_file(datafolder() + "avatar_1eye_good_folder.xml"));
-  ASSERT_TRUE(xml_avatar.neyes() == 1) << "neyes:" << xml_avatar.neyes();
-  ASSERT_TRUE(xml_avatar.redraw());
+  SDLAvatar avatar;
+  ASSERT_TRUE(avatar.from_xml_file(datafolder() + "avatar_1eye_good_folder.xml"));
+  ASSERT_TRUE(avatar.neyes() == 1) << "neyes:" << avatar.neyes();
+  ASSERT_TRUE(avatar.render());
 }
 TEST(TestSuite, avatar_2eyes) {
-  XmlAvatar xml_avatar;
-  ASSERT_TRUE(xml_avatar.from_xml_file(datafolder() + "avatar_2eyes.xml"));
-  ASSERT_TRUE(xml_avatar.neyes()     == 1) << "neyes:" << xml_avatar.neyes();
-  ASSERT_TRUE(xml_avatar.neye_rois() == 2) << "neye_rois:" << xml_avatar.neye_rois();
-  ASSERT_TRUE(xml_avatar.redraw());
+  SDLAvatar avatar;
+  ASSERT_TRUE(avatar.from_xml_file(datafolder() + "avatar_2eyes.xml"));
+  ASSERT_TRUE(avatar.neyes()     == 1) << "neyes:" << avatar.neyes();
+  ASSERT_TRUE(avatar.neye_rois() == 2) << "neye_rois:" << avatar.neye_rois();
+  ASSERT_TRUE(avatar.render());
+  ASSERT_TRUE(avatar.set_eyes_state("laughing"));
+  for (unsigned int i = 0; i < 10; ++i)
+    ASSERT_TRUE(avatar.render());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST(TestSuite, avatar_1led_no_folder) {
-  XmlAvatar xml_avatar;
-  ASSERT_TRUE(xml_avatar.from_xml_file(datafolder() + "avatar_1led_no_folder.xml"));
-  ASSERT_TRUE(xml_avatar.nleds() == 1) << "nleds:" << xml_avatar.nleds();
-  ASSERT_TRUE(xml_avatar.redraw());
+  SDLAvatar avatar;
+  ASSERT_TRUE(avatar.from_xml_file(datafolder() + "avatar_1led_no_folder.xml"));
+  ASSERT_TRUE(avatar.nleds() == 1) << "nleds:" << avatar.nleds();
+  ASSERT_TRUE(avatar.render());
 }
 TEST(TestSuite, avatar_1led_bad_folder) {
-  XmlAvatar xml_avatar;
-  ASSERT_TRUE(xml_avatar.from_xml_file(datafolder() + "avatar_1led_bad_folder.xml"));
-  ASSERT_TRUE(xml_avatar.nleds() == 1) << "nleds:" << xml_avatar.nleds();
-  ASSERT_TRUE(xml_avatar.redraw());
+  SDLAvatar avatar;
+  ASSERT_TRUE(avatar.from_xml_file(datafolder() + "avatar_1led_bad_folder.xml"));
+  ASSERT_TRUE(avatar.nleds() == 1) << "nleds:" << avatar.nleds();
+  ASSERT_TRUE(avatar.render());
 }
 TEST(TestSuite, avatar_1led_good_folder) {
-  XmlAvatar xml_avatar;
-  ASSERT_TRUE(xml_avatar.from_xml_file(datafolder() + "avatar_1led_good_folder.xml"));
-  ASSERT_TRUE(xml_avatar.nleds() == 1) << "nleds:" << xml_avatar.nleds();
-  ASSERT_TRUE(xml_avatar.redraw());
+  SDLAvatar avatar;
+  ASSERT_TRUE(avatar.from_xml_file(datafolder() + "avatar_1led_good_folder.xml"));
+  ASSERT_TRUE(avatar.nleds() == 1) << "nleds:" << avatar.nleds();
+  ASSERT_TRUE(avatar.render());
 }
 TEST(TestSuite, avatar_2leds) {
-  XmlAvatar xml_avatar;
-  ASSERT_TRUE(xml_avatar.from_xml_file(datafolder() + "avatar_2leds.xml"));
-  ASSERT_TRUE(xml_avatar.nleds() == 2) << "nleds:" << xml_avatar.nleds();
-  ASSERT_TRUE(xml_avatar.get_led(0).get_auto_mode() == true);
-  ASSERT_TRUE(xml_avatar.get_led(0).get_auto_mode_threshold() == 0.5)
-      << "thres:" << xml_avatar.get_led(0).get_auto_mode_threshold();
-  ASSERT_TRUE(xml_avatar.get_led(1).get_auto_mode() == false);
-  ASSERT_TRUE(xml_avatar.redraw());
+  SDLAvatar avatar;
+  ASSERT_TRUE(avatar.from_xml_file(datafolder() + "avatar_2leds.xml"));
+  ASSERT_TRUE(avatar.nleds() == 2) << "nleds:" << avatar.nleds();
+  ASSERT_TRUE(avatar.get_led(0).get_auto_mode() == true);
+  ASSERT_TRUE(avatar.get_led(0).get_auto_mode_threshold() == 0.5)
+      << "thres:" << avatar.get_led(0).get_auto_mode_threshold();
+  ASSERT_TRUE(avatar.get_led(1).get_auto_mode() == false);
+  ASSERT_TRUE(avatar.render());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST(TestSuite, avatar_2eyes2leds) {
-  XmlAvatar xml_avatar;
-  ASSERT_TRUE(xml_avatar.from_xml_file(datafolder() + "avatar_2eyes2leds.xml"));
-  ASSERT_TRUE(xml_avatar.neyes()     == 1) << "neyes:" << xml_avatar.neyes();
-  ASSERT_TRUE(xml_avatar.neye_rois() == 2) << "neye_rois:" << xml_avatar.neye_rois();
-  ASSERT_TRUE(xml_avatar.nleds() == 2) << "nleds:" << xml_avatar.nleds();
-  ASSERT_TRUE(xml_avatar.redraw());
+  SDLAvatar avatar;
+  ASSERT_TRUE(avatar.from_xml_file(datafolder() + "avatar_2eyes2leds.xml"));
+  ASSERT_TRUE(avatar.neyes()     == 1) << "neyes:" << avatar.neyes();
+  ASSERT_TRUE(avatar.neye_rois() == 2) << "neye_rois:" << avatar.neye_rois();
+  ASSERT_TRUE(avatar.nleds() == 2) << "nleds:" << avatar.nleds();
+  ASSERT_TRUE(avatar.render());
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+TEST(TestSuite, avatar_change_state) {
+  SDLAvatar avatar;
+  ASSERT_TRUE(avatar.from_xml_file(datafolder() + "avatar_1eye_good_folder.xml"));
+  for (unsigned int i = 0; i < 10; ++i)
+    ASSERT_TRUE(avatar.render());
+  ASSERT_TRUE(avatar.set_eyes_state("angry"));
+  for (unsigned int i = 0; i < 10; ++i)
+    ASSERT_TRUE(avatar.render());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST(TestSuite, avatar_mini) {
-  XmlAvatar xml_avatar;
-  ASSERT_TRUE(xml_avatar.from_xml_file(datafolder() + "avatar_mini.xml"));
-  ASSERT_TRUE(xml_avatar.neyes()     == 1) << "neyes:" << xml_avatar.neyes();
-  ASSERT_TRUE(xml_avatar.neye_rois() == 2) << "neye_rois:" << xml_avatar.neye_rois();
-  ASSERT_TRUE(xml_avatar.nleds() == 6) << "nleds:" << xml_avatar.nleds();
-  ASSERT_TRUE(xml_avatar.redraw());
+  SDLAvatar avatar;
+  ASSERT_TRUE(avatar.from_xml_file(datafolder() + "avatar_mini.xml"));
+  ASSERT_TRUE(avatar.neyes()     == 1) << "neyes:" << avatar.neyes();
+  ASSERT_TRUE(avatar.neye_rois() == 2) << "neye_rois:" << avatar.neye_rois();
+  ASSERT_TRUE(avatar.nleds() == 6) << "nleds:" << avatar.nleds();
+  ASSERT_TRUE(avatar.render());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 TEST(TestSuite, avatar_octopus) {
-  XmlAvatar xml_avatar;
-  ASSERT_TRUE(xml_avatar.from_xml_file(datafolder() + "avatar_octopus.xml"));
-  ASSERT_TRUE(xml_avatar.redraw());
+  SDLAvatar avatar;
+  ASSERT_TRUE(avatar.from_xml_file(datafolder() + "avatar_octopus.xml"));
+  for (unsigned int i = 0; i < 10; ++i)
+    ASSERT_TRUE(avatar.render());
+  ASSERT_TRUE(avatar.set_eyes_state("laughing"));
+  for (unsigned int i = 0; i < 10; ++i)
+    ASSERT_TRUE(avatar.render());
 }
 
 ////////////////////////////////////////////////////////////////////////////////

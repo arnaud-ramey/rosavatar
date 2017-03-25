@@ -1,5 +1,9 @@
 <?xml version="1.0"?>
+<!--
 <background width="800" height="600" r="32" g="255" b="22"/>
+-->
+<background width="800" height="600"
+            file="$(find rosavatar)/third_parties/avatar/data/backgrounds/green_gradient.png"/>
 
 <!-- top line -->
 <led center_pos_x="284" center_pos_y="532" auto_mode_threshold="0.9"

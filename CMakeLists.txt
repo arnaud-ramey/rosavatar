@@ -4,9 +4,11 @@ cmake_minimum_required(VERSION 2.8.3)
 project(rosavatar)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra") # add extra warnings
 ### 3 - Find other CMake/Catkin packages needed for build
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake) # add "cmake" folder for "FindSDL2.cmake"
 find_package(catkin REQUIRED COMPONENTS roscpp  cv_bridge  image_transport  vision_utils)
-find_package( OpenCV REQUIRED )
 find_package( Boost COMPONENTS system filesystem)
+find_package( OpenCV REQUIRED )
+find_package( SDL2 REQUIRED )
 ### 4 - Message/Service/Action Generators (add_message_files(), add_service_files(), add_action_files())
 # nothing to do
 ### 5 - Invoke message/service/action generation (generate_messages())

@@ -18,20 +18,48 @@
    inkscape:version="0.91 r13725"
    sodipodi:docname="avatar_octopus.svg">
   <defs
-     id="defs4" />
+     id="defs4">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient4170">
+      <stop
+         style="stop-color:#20ff16;stop-opacity:1;"
+         offset="0"
+         id="stop4172" />
+      <stop
+         id="stop4178"
+         offset="0.7601518"
+         style="stop-color:#14dd0b;stop-opacity:1;" />
+      <stop
+         style="stop-color:#08bb00;stop-opacity:1"
+         offset="1"
+         id="stop4174" />
+    </linearGradient>
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4170"
+       id="radialGradient4176"
+       cx="399.00299"
+       cy="725.68048"
+       fx="399.00299"
+       fy="725.68048"
+       r="400"
+       gradientTransform="matrix(0.98641404,-4.201767e-6,0,0.59797202,5.2260553,295.98636)"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
   <sodipodi:namedview
      id="base"
-     pagecolor="#20ff16"
+     pagecolor="#ffffff"
      bordercolor="#666666"
      borderopacity="1.0"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1"
-     inkscape:cx="422.54102"
-     inkscape:cy="297.786"
+     inkscape:zoom="0.70710678"
+     inkscape:cx="317.45646"
+     inkscape:cy="258.35237"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
-     showgrid="0"
+     showgrid="false"
      inkscape:window-width="1366"
      inkscape:window-height="768"
      inkscape:window-x="0"
@@ -56,9 +84,19 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(0,-452.36197)">
+    <rect
+       style="fill:url(#radialGradient4176);fill-opacity:1"
+       id="rect4160"
+       width="800"
+       height="600"
+       x="-6.6757207e-06"
+       y="454.14963"
+       inkscape:export-filename="green_gradient.png"
+       inkscape:export-xdpi="90.000008"
+       inkscape:export-ydpi="90.000008" />
     <g
        id="g4249"
-       transform="matrix(1,0,0,-1,-4.6704102e-6,1506.0939)">
+       transform="translate(-4.6704102e-6,2.4114991e-5)">
       <image
          width="32"
          height="32.000004"
@@ -74,21 +112,21 @@
         <image
            sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/data/../third_parties/avatar/data/mini_eyes/bg.png"
            xlink:href="../third_parties/avatar/data/mini_eyes/bg.png"
-           y="564.51636"
-           x="236"
-           id="image4144"
-           preserveAspectRatio="none"
-           height="128"
-           width="128" />
-        <image
-           sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/data/../third_parties/avatar/data/mini_eyes/bg.png"
-           xlink:href="../third_parties/avatar/data/mini_eyes/bg.png"
            width="128"
            height="128"
            preserveAspectRatio="none"
-           id="image4146"
+           id="image4144"
            x="236"
-           y="724.51636" />
+           y="564.51636" />
+        <image
+           sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/data/../third_parties/avatar/data/mini_eyes/bg.png"
+           xlink:href="../third_parties/avatar/data/mini_eyes/bg.png"
+           y="724.51636"
+           x="236"
+           id="image4146"
+           preserveAspectRatio="none"
+           height="128"
+           width="128" />
       </g>
       <g
          transform="translate(30.3333,0)"
@@ -96,21 +134,21 @@
         <image
            sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/data/../third_parties/avatar/data/mini_eyes/bg.png"
            xlink:href="../third_parties/avatar/data/mini_eyes/bg.png"
-           width="128"
-           height="128"
-           preserveAspectRatio="none"
+           y="564.51636"
+           x="378"
            id="image4165"
-           x="378"
-           y="564.51636" />
-        <image
-           sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/data/../third_parties/avatar/data/mini_eyes/bg.png"
-           xlink:href="../third_parties/avatar/data/mini_eyes/bg.png"
-           y="724.51636"
-           x="378"
-           id="image4167"
            preserveAspectRatio="none"
            height="128"
            width="128" />
+        <image
+           sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/data/../third_parties/avatar/data/mini_eyes/bg.png"
+           xlink:href="../third_parties/avatar/data/mini_eyes/bg.png"
+           width="128"
+           height="128"
+           preserveAspectRatio="none"
+           id="image4167"
+           x="378"
+           y="724.51636" />
       </g>
       <g
          transform="translate(34.999995,0)"
@@ -118,21 +156,21 @@
         <image
            sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/data/../third_parties/avatar/data/mini_eyes/bg.png"
            xlink:href="../third_parties/avatar/data/mini_eyes/bg.png"
-           y="484.51636"
-           x="518"
-           id="image4169"
-           preserveAspectRatio="none"
-           height="128"
-           width="128" />
-        <image
-           sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/data/../third_parties/avatar/data/mini_eyes/bg.png"
-           xlink:href="../third_parties/avatar/data/mini_eyes/bg.png"
            width="128"
            height="128"
            preserveAspectRatio="none"
-           id="image4171"
+           id="image4169"
            x="518"
-           y="644.51636" />
+           y="484.51636" />
+        <image
+           sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/data/../third_parties/avatar/data/mini_eyes/bg.png"
+           xlink:href="../third_parties/avatar/data/mini_eyes/bg.png"
+           y="644.51636"
+           x="518"
+           id="image4171"
+           preserveAspectRatio="none"
+           height="128"
+           width="128" />
       </g>
       <g
          transform="translate(34.999992,0)"
@@ -140,21 +178,21 @@
         <image
            sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/data/../third_parties/avatar/data/mini_eyes/bg.png"
            xlink:href="../third_parties/avatar/data/mini_eyes/bg.png"
-           width="128"
-           height="128"
-           preserveAspectRatio="none"
+           y="484.51636"
+           x="84"
            id="image4173"
-           x="84"
-           y="484.51636" />
-        <image
-           sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/data/../third_parties/avatar/data/mini_eyes/bg.png"
-           xlink:href="../third_parties/avatar/data/mini_eyes/bg.png"
-           y="644.51636"
-           x="84"
-           id="image4175"
            preserveAspectRatio="none"
            height="128"
            width="128" />
+        <image
+           sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/data/../third_parties/avatar/data/mini_eyes/bg.png"
+           xlink:href="../third_parties/avatar/data/mini_eyes/bg.png"
+           width="128"
+           height="128"
+           preserveAspectRatio="none"
+           id="image4175"
+           x="84"
+           y="644.51636" />
       </g>
       <image
          sodipodi:absref="/home/arnaud/catkin_ws/src/rosavatar/third_parties/avatar/data/leds/white_on.png"
