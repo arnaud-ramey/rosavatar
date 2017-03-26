@@ -8,6 +8,10 @@ compiler:
   - gcc
 
 before_install:
+  # intall libsdl2 from PPA
+  - sudo apt-add-repository --yes ppa:zoogie/sdl2-snapshots
+  - sudo apt-get -qq update
+  - sudo apt-get install -y  libsdl2-image-dev
   # install ROS according to http://wiki.ros.org/indigo/Installation/Ubuntu
   - export ROS_DISTRO=indigo
   - sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu trusty main" > /etc/apt/sources.list.d/ros-latest.list'

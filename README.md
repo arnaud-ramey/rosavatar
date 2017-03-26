@@ -71,3 +71,10 @@ To install:
 $ git clone https://github.com/OTL/cv_camera
 $ catkin_make --only-pkg-with-deps rosavatar cv_camera
 ```
+
+Licence
+=======
+
+LGPL v3 (GNU Lesser General Public License version 3).
+See LICENCE.
+

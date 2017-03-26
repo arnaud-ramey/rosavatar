@@ -10,7 +10,7 @@
 #include <gtest/gtest.h>
 #include <rosavatar/rosavatar.h>
 
-std::string datafolder() { return ros::package::getPath("rosavatar") + "/data/"; }
+std::string datafolder() { return ros::package::getPath("rosavatar") + "/data/avatars/"; }
 
 void test_tags(const std::string & in, const std::string & exp) {
   std::string out = vision_utils::replace_find_tags(in);

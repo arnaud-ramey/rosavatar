@@ -15,15 +15,14 @@ find_package( SDL2 REQUIRED )
 # nothing to do
 ### 6 - Specify package build info export (catkin_package())
 catkin_package(
-  INCLUDE_DIRS include third_parties
+  INCLUDE_DIRS include
   CATKIN_DEPENDS roscpp cv_bridge image_transport
 )
 ### 7 - Libraries/Executables to build (add_library()/add_executable()/target_link_libraries())
 include_directories(
-  include third_parties
+  include
   ${catkin_INCLUDE_DIRS}
 )
-ADD_SUBDIRECTORY(third_parties)
 ADD_SUBDIRECTORY(src)
 ### 8 - Tests to build (catkin_add_gtest())
 ADD_SUBDIRECTORY(test)

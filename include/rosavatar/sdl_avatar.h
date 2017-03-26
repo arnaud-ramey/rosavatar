@@ -28,11 +28,15 @@ ________________________________________________________________________________
 //#define DEBUG // to activate all the printf(), also used in sdl_utils
 
 // utils
+#include "vision_utils/all_files_in_dir.h"
 #include "vision_utils/all_subfolders.h"
 #include "vision_utils/clamp.h"
 #include "vision_utils/rand_gaussian.h"
 #include "vision_utils/replace_find_tags.h"
 #include "vision_utils/sdl_utils.h"
+//#include "vision_utils/sdl_mixer_utils.h"
+//#include "vision_utils/sdl_gfx_utils.h"
+//#include <vision_utils/sdl_ttf_utils.h>
 #include "vision_utils/XmlDocument.h"
 // C
 #include <dirent.h>
@@ -44,35 +48,14 @@ inline bool imread_all_files_in_dir(SDL_Renderer* renderer,
                                     const std::string pattern = "") {
   DEBUG_PRINT("imread_all_files_in_dir('%s', pattern:'%s')\n",
               folder.c_str(), pattern.c_str());
-  ans.clear();
-  DIR *dir = opendir (folder.c_str());
-  if (dir == NULL) {
-    printf("imread_all_files_in_dir: could not open directory:'%s'\n", folder.c_str());
-    return false;
-  }
-  struct dirent *ent;
-  std::string folder_and_slash = folder + std::string("/");
   std::vector<std::string> filenames;
-  while ((ent = readdir (dir)) != NULL) {
-    std::string filename(ent->d_name); // pattern check
-    if (pattern.size() > 0 && filename.find(pattern) == std::string::npos)
-      continue;
-    filenames.push_back(filename);
-  }
-  closedir (dir);
-  if (filenames.empty()) {
-    printf("Could not read any 4-channel image in '%s'with pattern '%s'\n",
-           folder.c_str(), pattern.c_str());
-    return false;
-  }
-
-  std::sort(filenames.begin(), filenames.end()); // alphabetical sort
-  // now read images
+  vision_utils::all_files_in_dir(folder, filenames, pattern);
   unsigned int nfiles = filenames.size();
+  // now read images
   ans.resize(nfiles);
   for (unsigned int i = 0; i < nfiles; ++i) {
     //DEBUG_PRINT("filename:'%s'\n", filenames[i].c_str());
-    if (!ans[i].from_file(renderer, folder_and_slash + filenames[i]))
+    if (!ans[i].from_file(renderer, filenames[i]))
       return false;
   } // end loop i
   return true;
@@ -152,7 +135,7 @@ public:
   bool from_default_imgs(SDL_Renderer* renderer) {
     DEBUG_PRINT("Eye::from_default_imgs(renderer)\n");
     _states_data.clear();
-    std::string path = ros::package::getPath("rosavatar") + "/third_parties/avatar/data/mini_eyes";
+    std::string path = ros::package::getPath("rosavatar") + "/data/mini_eyes";
     return from_imgs(renderer, path);
   } // end from_default_imgs(renderer)
 
@@ -422,7 +405,7 @@ public:
 
 protected:
   bool from_default_imgs(SDL_Renderer* renderer) {
-    std::string path = ros::package::getPath("rosavatar") + "/third_parties/avatar/data/leds/blue";
+    std::string path = ros::package::getPath("rosavatar") + "/data/leds/blue";
     return from_imgs(renderer, path);
   }
 
