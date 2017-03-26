@@ -34,9 +34,6 @@ ________________________________________________________________________________
 #include "vision_utils/rand_gaussian.h"
 #include "vision_utils/replace_find_tags.h"
 #include "vision_utils/sdl_utils.h"
-//#include "vision_utils/sdl_mixer_utils.h"
-//#include "vision_utils/sdl_gfx_utils.h"
-//#include <vision_utils/sdl_ttf_utils.h>
 #include "vision_utils/XmlDocument.h"
 // C
 #include <dirent.h>
@@ -427,7 +424,8 @@ public:
     _leds.reserve(100);
   }
 
-  bool init(int winw = 640, int winh = 480) {
+  bool init(int winw = 640, int winh = 480,
+            Uint32 win_flags = 0) {
     DEBUG_PRINT("init(%ix%i)\n", winw, winh);
     if (_init_done)
       return true;
@@ -442,7 +440,8 @@ public:
 
     // create window
     SDL_Rect windowRect = { 10, 10, winw, winh};
-    _window = SDL_CreateWindow( "cars", windowRect.x, windowRect.y, winw, winh, 0 );
+    _window = SDL_CreateWindow( "Avatar", windowRect.x, windowRect.y, winw, winh,
+                                win_flags);
     if ( _window == NULL ) {
       printf("Failed to create window:'%s'\n", SDL_GetError());
       return false;
@@ -483,7 +482,8 @@ public:
 
   //////////////////////////////////////////////////////////////////////////////
 
-  bool from_xml_file(const std::string & filename) {
+  bool from_xml_file(const std::string & filename,
+                     Uint32 win_flags = 0) {
     vision_utils::XmlDocument doc;
     if (!doc.load_from_file(vision_utils::replace_find_tags(filename)))
       return false;
@@ -495,7 +495,7 @@ public:
     }
     int width  = doc.get_node_attribute(bg, "width", 640);
     int height = doc.get_node_attribute(bg, "height", 480);
-    if (!init(width, height))
+    if (!init(width, height, win_flags))
       return false;
     std::string bg_file = doc.get_node_attribute(bg, "file");
     if (bg_file.size()) { // use background image file
@@ -593,10 +593,10 @@ public:
 
   //////////////////////////////////////////////////////////////////////////////
 
-  bool load_default_avatar() {
+  bool load_default_avatar(Uint32 win_flags = 0) {
     DEBUG_PRINT("Avatar::load_default_avatar()\n");
     unsigned int w = 640, h = 480;
-    if (!init(w, h))
+    if (!init(w, h, win_flags))
       return false;
     // add eyes
     std::vector<Point2i> center_pos;

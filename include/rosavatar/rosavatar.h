@@ -12,13 +12,13 @@ class RosAvatar : public SDLAvatar {
 public:
   RosAvatar() : nh_private("~") {}
 
-  bool init() {
+  bool init(Uint32 win_flags = 0) {
     // get params
     std::string xml_file = "";
     nh_private.param("xml_file", xml_file, xml_file);
     if (xml_file.empty() && !load_default_avatar())
       return false;
-    else if (!from_xml_file(xml_file))
+    else if (!from_xml_file(xml_file, win_flags))
       return false;
     // create subscribers
     _iris_pos_sub = nh_private.subscribe("iris_position", 1, &RosAvatar::iris_pos_cb, this);
