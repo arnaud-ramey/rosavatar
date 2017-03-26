@@ -98,12 +98,15 @@ TEST(TestSuite, avatar_1led_good_folder) {
   SDLAvatar avatar;
   ASSERT_TRUE(avatar.from_xml_file(datafolder() + "avatar_1led_good_folder.xml", win_flags));
   ASSERT_TRUE(avatar.nleds() == 1) << "nleds:" << avatar.nleds();
+  ASSERT_TRUE(avatar.get_led(0).get_name() == "led1") << "name:" << avatar.get_led(0).get_name();
   ASSERT_TRUE(avatar.render());
 }
 TEST(TestSuite, avatar_2leds) {
   SDLAvatar avatar;
   ASSERT_TRUE(avatar.from_xml_file(datafolder() + "avatar_2leds.xml", win_flags));
   ASSERT_TRUE(avatar.nleds() == 2) << "nleds:" << avatar.nleds();
+  ASSERT_TRUE(avatar.get_led(0).get_name() == "myled") << "name:" << avatar.get_led(0).get_name();
+  ASSERT_TRUE(avatar.get_led(1).get_name() == "led2") << "name:" << avatar.get_led(1).get_name();
   ASSERT_TRUE(avatar.get_led(0).get_auto_mode() == true);
   ASSERT_TRUE(avatar.get_led(0).get_auto_mode_threshold() == 0.5)
       << "thres:" << avatar.get_led(0).get_auto_mode_threshold();

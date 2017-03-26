@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!--
+<background width="800" height="600" r="32" g="255" b="22"/>
+-->
+<background width="1000" height="1000"
+            file="$(find rosavatar)/data/mip/mip.png"/>
+
+<!-- right eye -->
+<led center_pos_x="413" center_pos_y="186" auto_mode_threshold="0.9"
+     folder="$(find rosavatar)/data/mip/eye" />
+<led center_pos_x="471" center_pos_y="186" auto_mode_threshold="0.8"
+     folder="$(find rosavatar)/data/mip/eye_flip" />
+<!-- left eye -->
+<led center_pos_x="536" center_pos_y="186" auto_mode_threshold="0.8"
+     folder="$(find rosavatar)/data/mip/eye" />
+<led center_pos_x="592" center_pos_y="186" auto_mode_threshold="0.9"
+     folder="$(find rosavatar)/data/mip/eye_flip" />
+
+<led center_pos_x="505" center_pos_y="385" auto_mode_threshold="0.7"
+     folder="$(find rosavatar)/data/mip/chest" />

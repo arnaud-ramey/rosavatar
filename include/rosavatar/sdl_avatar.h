@@ -375,6 +375,11 @@ public:
 
   //////////////////////////////////////////////////////////////////////////////
 
+  std::string get_name()  const { return _name; }
+  void set_name(const std::string & n) { _name = n; }
+
+  //////////////////////////////////////////////////////////////////////////////
+
   void set_auto_mode(const double & auto_mode_threshold) {
     _auto_mode = true;
     _auto_mode_threshold = auto_mode_threshold;
@@ -406,6 +411,7 @@ protected:
     return from_imgs(renderer, path);
   }
 
+  std::string _name;
   State _state;
   bool _auto_mode;
   Texture _off_img, _on_img;
@@ -539,6 +545,7 @@ public:
     for (unsigned int i = 0; i < led_nodes.size(); ++i) {
       Node* led_node = led_nodes[i];
       std::string folder = doc.get_node_attribute(led_node, "folder");
+      std::string xml_name = doc.get_node_attribute(led_node, "name");
       int center_pos_x = doc.get_node_attribute(led_node, "center_pos_x", 0);
       int center_pos_y = doc.get_node_attribute(led_node, "center_pos_y", 0);
       bool has_auto_mode = doc.has_node_attribute(led_node, "auto_mode_threshold");
@@ -549,6 +556,10 @@ public:
         return false;
       if (has_auto_mode)
         _leds.back().set_auto_mode(auto_mode_threshold);
+      std::string real_name = (xml_name.empty() ?
+                                 std::string("led") + vision_utils::cast_to_string(_leds.size())
+                               : xml_name);
+      _leds.back().set_name(real_name);
     } // end for i
     return true; // success
   }
