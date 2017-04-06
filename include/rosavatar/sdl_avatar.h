@@ -58,6 +58,25 @@ inline bool imread_all_files_in_dir(SDL_Renderer* renderer,
   return true;
 } // end imread_all_files_in_dir()
 
+inline bool replace_colors(SDL_Surface * in, SDL_Surface * out,
+                           SDL_Color find, SDL_Color replacewith) {
+  unsigned int w = in->w, h = in->h;
+  if(!in || !w || !h)
+    return false;
+  Uint32 f = color2int(find), r = color2int(replacewith);
+  SDL_FreeSurface(out);
+  SDL_BlitSurface(in, NULL, out, NULL);
+//  *out = SDL_CreateRGBSurface(in->flags, w, h, in->format->BitsPerPixel,
+//                              in->format->Rmask, in->format->Gmask,
+//                              in->format->Bmask, in->format->Amask);
+  for(unsigned int y = 0; y < h; y++) {
+    for(unsigned int x = 0; x < w; x++) {
+      if (getpixel(in, x, y) == f)
+        putpixel(out, x, y, r);
+    } // end for x;
+  } // end for y
+  return true;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -135,11 +154,6 @@ public:
     std::string path = ros::package::getPath("rosavatar") + "/data/mini_eyes";
     return from_imgs(renderer, path);
   } // end from_default_imgs(renderer)
-
-  //////////////////////////////////////////////////////////////////////////////
-
-  int get_width()  const { return _bg.get_width(); }
-  int get_height() const { return _bg.get_height(); }
 
   //////////////////////////////////////////////////////////////////////////////
 
@@ -344,17 +358,17 @@ protected:
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-class Led {
+class BinaryLed {
 public:
   enum State { OFF = 0, ON = 1 };
 
-  Led() : _state(OFF), _auto_mode(false) {}
+  BinaryLed() : _state(OFF), _auto_mode(false) {}
 
   //////////////////////////////////////////////////////////////////////////////
 
   bool from_imgs(SDL_Renderer* renderer,
                  const std::string & led_prefix = "") {
-    DEBUG_PRINT("Led::from_imgs('%s')\n", led_prefix.c_str());
+    DEBUG_PRINT("BinaryLed::from_imgs('%s')\n", led_prefix.c_str());
     if (led_prefix.empty())
       return from_default_imgs(renderer);
     std::ostringstream on_file, off_file;
@@ -366,12 +380,7 @@ public:
 
   //////////////////////////////////////////////////////////////////////////////
 
-  inline void set_state(Led::State state) { _state = state; }
-
-  //////////////////////////////////////////////////////////////////////////////
-
-  int get_width()  const { return _on_img.get_width(); }
-  int get_height() const { return _on_img.get_height(); }
+  inline void set_state(BinaryLed::State state) { _state = state; }
 
   //////////////////////////////////////////////////////////////////////////////
 
@@ -397,7 +406,7 @@ public:
 
   bool render_center(SDL_Renderer* renderer,
                      const Point2i & center_position) {
-    DEBUG_PRINT("Led::render_center()\n");
+    DEBUG_PRINT("BinaryLed::render_center()\n");
     Texture* to_copy = &(_state == OFF ? _off_img : _on_img);
     to_copy->render_center(renderer, center_position);
     return true;
@@ -421,13 +430,70 @@ protected:
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
+class ColorLed {
+public:
+  typedef SDL_Color Color;
+
+  bool from_imgs(SDL_Renderer* renderer,
+                 const std::string & led_prefix = "") {
+    DEBUG_PRINT("ColorLed::from_imgs('%s')\n", led_prefix.c_str());
+    if (led_prefix.empty())
+      return from_default_imgs(renderer);
+    std::ostringstream bg_file, top_file;
+    bg_file << led_prefix << "_bg.png";
+    top_file << led_prefix << "_top.png";
+    return (!_bg_img.from_file(renderer, bg_file.str())
+            || _top_img.from_file(renderer, top_file.str()));
+  } // end from_imgs();
+
+  //////////////////////////////////////////////////////////////////////////////
+
+  inline bool set_color(SDL_Renderer* renderer, Color c) {
+    SDL_Surface* tmp;
+    _color = c;
+    if (!replace_colors(_bg_img.get_sdlsurface_raw(), tmp, _tofind_color, _color)
+      || !_bg_tinted_img.from_surface(tmp, renderer))
+      return false;
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+
+  std::string get_name()  const { return _name; }
+  void set_name(const std::string & n) { _name = n; }
+
+  //////////////////////////////////////////////////////////////////////////////
+
+  bool render_center(SDL_Renderer* renderer,
+                     const Point2i & center_position) {
+    _bg_img.render_center(renderer, center_position);
+    _top_img.render_center(renderer, center_position);
+    return true;
+  } // end render_center();
+
+  //////////////////////////////////////////////////////////////////////////////
+
+protected:
+  bool from_default_imgs(SDL_Renderer* renderer) {
+    std::string path = ros::package::getPath("rosavatar") + "/data/leds/binary";
+    return from_imgs(renderer, path);
+  }
+
+  std::string _name;
+  Color _tofind_color, _color;
+  Texture _top_img, _bg_img, _bg_tinted_img;
+}; // end class Led
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
 class SDLAvatar {
 public:
   typedef vision_utils::XmlDocument::Node Node;
 
   SDLAvatar()  : _init_done(false), _renderer(NULL), _window(NULL) {
     _eyes.reserve(100);
-    _leds.reserve(100);
+    _binary_leds.reserve(100);
+    _color_leds.reserve(100);
   }
 
   bool init(int winw = 640, int winh = 480,
@@ -476,8 +542,10 @@ public:
   ~SDLAvatar() {
     // clear components
     _eye_datas.clear();
-    _leds.clear();
-    _led_centers.clear();
+    _binary_leds.clear();
+    _binary_led_centers.clear();
+    _color_leds.clear();
+    _color_led_centers.clear();
     if (_renderer)
       SDL_DestroyRenderer(_renderer);
     if (_window)
@@ -539,11 +607,11 @@ public:
         return false;
     } // end for i
 
-    // get led nodes
-    std::vector<Node*> led_nodes;
-    doc.get_all_nodes_at_direction(doc.root(), "led", led_nodes);
-    for (unsigned int i = 0; i < led_nodes.size(); ++i) {
-      Node* led_node = led_nodes[i];
+    // get binary led nodes
+    std::vector<Node*> binary_led_nodes;
+    doc.get_all_nodes_at_direction(doc.root(), "binary_led", binary_led_nodes);
+    for (unsigned int i = 0; i < binary_led_nodes.size(); ++i) {
+      Node* led_node = binary_led_nodes[i];
       std::string folder = doc.get_node_attribute(led_node, "folder");
       std::string xml_name = doc.get_node_attribute(led_node, "name");
       int center_pos_x = doc.get_node_attribute(led_node, "center_pos_x", 0);
@@ -551,15 +619,34 @@ public:
       bool has_auto_mode = doc.has_node_attribute(led_node, "auto_mode_threshold");
       double auto_mode_threshold = doc.get_node_attribute(led_node, "auto_mode_threshold", -1.0);
       // load led imgs if needed
-      if (!add_led(Point2i(center_pos_x, center_pos_y),
+      if (!add_binary_led(Point2i(center_pos_x, center_pos_y),
                    vision_utils::replace_find_tags(folder)))
         return false;
       if (has_auto_mode)
-        _leds.back().set_auto_mode(auto_mode_threshold);
+        _binary_leds.back().set_auto_mode(auto_mode_threshold);
       std::string real_name = (xml_name.empty() ?
-                                 std::string("led") + vision_utils::cast_to_string(_leds.size())
+                                 std::string("binary_led") + vision_utils::cast_to_string(_binary_leds.size())
                                : xml_name);
-      _leds.back().set_name(real_name);
+      _binary_leds.back().set_name(real_name);
+    } // end for i
+
+    // get color led nodes
+    std::vector<Node*> color_led_nodes;
+    doc.get_all_nodes_at_direction(doc.root(), "color_led", color_led_nodes);
+    for (unsigned int i = 0; i < color_led_nodes.size(); ++i) {
+      Node* led_node = color_led_nodes[i];
+      std::string folder = doc.get_node_attribute(led_node, "folder");
+      std::string xml_name = doc.get_node_attribute(led_node, "name");
+      int center_pos_x = doc.get_node_attribute(led_node, "center_pos_x", 0);
+      int center_pos_y = doc.get_node_attribute(led_node, "center_pos_y", 0);
+      // load led imgs if needed
+      if (!add_color_led(Point2i(center_pos_x, center_pos_y),
+                   vision_utils::replace_find_tags(folder)))
+        return false;
+      std::string real_name = (xml_name.empty() ?
+                                 std::string("color_led") + vision_utils::cast_to_string(_color_leds.size())
+                               : xml_name);
+      _color_leds.back().set_name(real_name);
     } // end for i
     return true; // success
   }
@@ -593,13 +680,21 @@ public:
 
   //////////////////////////////////////////////////////////////////////////////
 
-  inline bool add_led(const Point2i & center_pos,
+  inline bool add_binary_led(const Point2i & center_pos,
                       const std::string & leds_folder = "") {
-    _led_centers.push_back(center_pos);
-    DEBUG_PRINT("Before resizing...\n");
-    _leds.push_back(Led());
-    DEBUG_PRINT("After resizing...\n");
-    return(_leds.back().from_imgs(_renderer, leds_folder));
+    _binary_led_centers.push_back(center_pos);
+    _binary_leds.push_back(BinaryLed());
+    return(_binary_leds.back().from_imgs(_renderer, leds_folder));
+  }
+
+
+  //////////////////////////////////////////////////////////////////////////////
+
+  inline bool add_color_led(const Point2i & center_pos,
+                      const std::string & leds_folder = "") {
+    _color_led_centers.push_back(center_pos);
+    _color_leds.push_back(ColorLed());
+    return(_color_leds.back().from_imgs(_renderer, leds_folder));
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -622,10 +717,10 @@ public:
     unsigned int nleds = 5;
     for (unsigned int iled = 1; iled <= nleds; ++iled) {
       double led_ratio = 1. * abs(iled - .5*(nleds+1)) / (.5*(nleds+1));
-      if (!add_led(Point2i(iled*w/(nleds+1), 3*h/4 - led_ratio * h/4),
+      if (!add_binary_led(Point2i(iled*w/(nleds+1), 3*h/4 - led_ratio * h/4),
                    ""))
         return false;
-      _leds.back().set_auto_mode(led_ratio);
+      _binary_leds.back().set_auto_mode(led_ratio);
     }
     return render();
   } // end load_default_avatar();
@@ -637,17 +732,6 @@ public:
       if (!_eyes[i].set_state(state))
         return false;
     } // end for i
-    return true;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-
-  bool set_led_state(unsigned int led_idx, Led::State state){
-    if (led_idx >= _leds.size()) {
-      printf("Avatar::set_led(): size mismatch!\n");
-      return false;
-    }
-    _leds[led_idx].set_state(state);
     return true;
   }
 
@@ -688,21 +772,24 @@ public:
       } // end for i_roi
     } // end for i_eye
     // leds
-    for (unsigned int i_led = 0; i_led < nleds(); ++i_led) {
-      _leds[i_led].render_center(_renderer, _led_centers[i_led]);
-    } // end for i_led
+    for (unsigned int i_led = 0; i_led < nbinary_leds(); ++i_led)
+      _binary_leds[i_led].render_center(_renderer, _binary_led_centers[i_led]);
+    for (unsigned int i_led = 0; i_led < ncolor_leds(); ++i_led)
+      _color_leds[i_led].render_center(_renderer, _color_led_centers[i_led]);
     SDL_RenderPresent( _renderer);
     return true;
   } // end render_center()
 
   //////////////////////////////////////////////////////////////////////////////
 
-  inline SDL_Color    get_bg_color()      const { return _bg_color; }
-  inline const Eye &  get_eye(int i)      const { return _eyes[i]; }
-  inline const Led &  get_led(int i)      const { return _leds[i]; }
-  inline unsigned int neyes()             const { return _eyes.size(); }
-  inline unsigned int nleds()             const { return _leds.size(); }
-  inline unsigned int neye_rois()         const {
+  inline SDL_Color    get_bg_color()              const { return _bg_color; }
+  inline const Eye &  get_eye(int i)              const { return _eyes[i]; }
+  inline const BinaryLed &  get_binary_led(int i) const { return _binary_leds[i]; }
+  inline const ColorLed &   get_color_led(int i)  const { return _color_leds[i]; }
+  inline unsigned int neyes()                     const { return _eyes.size(); }
+  inline unsigned int nbinary_leds()              const { return _binary_leds.size(); }
+  inline unsigned int ncolor_leds()               const { return _color_leds.size(); }
+  inline unsigned int neye_rois()                 const {
     unsigned int ans = 0;
     for (unsigned int i = 0; i < _eye_datas.size(); ++i)
       ans += _eye_datas[i]._center_pos.size();
@@ -713,8 +800,9 @@ protected:
 
   //////////////////////////////////////////////////////////////////////////////
 
-  std::vector<Led> _leds;
-  std::vector<Point2i> _led_centers;
+  std::vector<BinaryLed> _binary_leds;
+  std::vector<ColorLed> _color_leds;
+  std::vector<Point2i> _binary_led_centers, _color_led_centers;
   std::vector<Eye> _eyes;
   std::vector<EyeData> _eye_datas;
   // SDL stuff

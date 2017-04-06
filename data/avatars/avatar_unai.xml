@@ -7,5 +7,5 @@
 </eye>
 
 <!-- mouth: y=73+38 from bottom -->
-<led center_pos_x="278" center_pos_y="489" auto_mode_threshold="0.8"
+<binary_led center_pos_x="278" center_pos_y="489" auto_mode_threshold="0.8"
      folder="$(find rosavatar)/data/unai/mouth" />

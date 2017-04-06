@@ -42,8 +42,8 @@ private:
 
   void mouth_vol_cb(const std_msgs::Float64ConstPtr & msg) {
     // printf("mouth_vol_cb()\n");
-    for (unsigned int i = 0; i < nleds(); ++i)
-      _leds[i].set_auto_mode_value(msg->data);
+    for (unsigned int i = 0; i < nbinary_leds(); ++i)
+      _binary_leds[i].set_auto_mode_value(msg->data);
   }
 
   SDL_Renderer* _renderer;
