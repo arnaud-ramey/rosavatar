@@ -85,32 +85,39 @@ TEST(TestSuite, avatar_2eyes) {
 TEST(TestSuite, avatar_1led_no_folder) {
   SDLAvatar avatar;
   ASSERT_TRUE(avatar.from_xml_file(datafolder() + "avatar_1led_no_folder.xml", win_flags));
-  ASSERT_TRUE(avatar.nbinary_leds() == 1) << "nleds:" << avatar.nbinary_leds();
+  ASSERT_TRUE(avatar.nrenderables() == 1)
+      << "nleds:" << avatar.nrenderables();
   ASSERT_TRUE(avatar.render());
 }
 TEST(TestSuite, avatar_1led_bad_folder) {
   SDLAvatar avatar;
   ASSERT_TRUE(avatar.from_xml_file(datafolder() + "avatar_1led_bad_folder.xml", win_flags));
-  ASSERT_TRUE(avatar.nbinary_leds() == 1) << "nleds:" << avatar.nbinary_leds();
+  ASSERT_TRUE(avatar.nrenderables() == 1)
+      << "nleds:" << avatar.nrenderables();
   ASSERT_TRUE(avatar.render());
 }
 TEST(TestSuite, avatar_1led_good_folder) {
   SDLAvatar avatar;
   ASSERT_TRUE(avatar.from_xml_file(datafolder() + "avatar_1led_good_folder.xml", win_flags));
-  ASSERT_TRUE(avatar.nbinary_leds() == 1) << "nleds:" << avatar.nbinary_leds();
-  ASSERT_TRUE(avatar.get_binary_led(0).get_name() == "led1") << "name:" << avatar.get_binary_led(0).get_name();
+  ASSERT_TRUE(avatar.nrenderables() == 1) << "nleds:" << avatar.nrenderables();
+  ASSERT_TRUE(avatar.get_renderable(0)->get_name() == "binary_led1")
+      << "name:" << avatar.get_renderable(0)->get_name();
   ASSERT_TRUE(avatar.render());
 }
 TEST(TestSuite, avatar_2leds) {
   SDLAvatar avatar;
   ASSERT_TRUE(avatar.from_xml_file(datafolder() + "avatar_2leds.xml", win_flags));
-  ASSERT_TRUE(avatar.nbinary_leds() == 2) << "nleds:" << avatar.nbinary_leds();
-  ASSERT_TRUE(avatar.get_binary_led(0).get_name() == "myled") << "name:" << avatar.get_binary_led(0).get_name();
-  ASSERT_TRUE(avatar.get_binary_led(1).get_name() == "led2") << "name:" << avatar.get_binary_led(1).get_name();
-  ASSERT_TRUE(avatar.get_binary_led(0).get_auto_mode() == true);
-  ASSERT_TRUE(avatar.get_binary_led(0).get_auto_mode_threshold() == 0.5)
-      << "thres:" << avatar.get_binary_led(0).get_auto_mode_threshold();
-  ASSERT_TRUE(avatar.get_binary_led(1).get_auto_mode() == false);
+  ASSERT_TRUE(avatar.nrenderables() == 2) << "nleds:" << avatar.nrenderables();
+  ASSERT_TRUE(avatar.get_rtype(0) == AvatarRenderable::BINARY_LED);
+  ASSERT_TRUE(avatar.get_rtype(1) == AvatarRenderable::BINARY_LED);
+  BinaryLed* l0 = (BinaryLed*) avatar.get_renderable(0);
+  BinaryLed* l1 = (BinaryLed*) avatar.get_renderable(1);
+  ASSERT_TRUE(l0->get_name() == "myled") << "name:" << l0->get_name();
+  ASSERT_TRUE(l1->get_name() == "binary_led2") << "name:" << l1->get_name();
+  ASSERT_TRUE(l0->get_auto_mode() == true);
+  ASSERT_TRUE(l0->get_auto_mode_threshold() == 0.5)
+      << "thres:" << l0->get_auto_mode_threshold();
+  ASSERT_TRUE(l1->get_auto_mode() == false);
   ASSERT_TRUE(avatar.render());
 }
 
@@ -121,7 +128,7 @@ TEST(TestSuite, avatar_2eyes2leds) {
   ASSERT_TRUE(avatar.from_xml_file(datafolder() + "avatar_2eyes2leds.xml", win_flags));
   ASSERT_TRUE(avatar.neyes()     == 1) << "neyes:" << avatar.neyes();
   ASSERT_TRUE(avatar.neye_rois() == 2) << "neye_rois:" << avatar.neye_rois();
-  ASSERT_TRUE(avatar.nbinary_leds() == 2) << "nleds:" << avatar.nbinary_leds();
+  ASSERT_TRUE(avatar.nrenderables() == 2) << "nleds:" << avatar.nrenderables();
   ASSERT_TRUE(avatar.render());
 }
 
@@ -144,7 +151,7 @@ TEST(TestSuite, avatar_mini) {
   ASSERT_TRUE(avatar.from_xml_file(datafolder() + "avatar_mini.xml", win_flags));
   ASSERT_TRUE(avatar.neyes()     == 1) << "neyes:" << avatar.neyes();
   ASSERT_TRUE(avatar.neye_rois() == 2) << "neye_rois:" << avatar.neye_rois();
-  ASSERT_TRUE(avatar.nbinary_leds() == 6) << "nleds:" << avatar.nbinary_leds();
+  ASSERT_TRUE(avatar.nrenderables() == 6) << "nleds:" << avatar.nrenderables();
   ASSERT_TRUE(avatar.render());
 }
 
