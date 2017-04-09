@@ -6,47 +6,46 @@
             file="$(find rosavatar)/data/backgrounds/green_gradient.png"/>
 
 <!-- top line -->
-<binary_led center_pos_x="284" center_pos_y="532" auto_mode_threshold="0.9"
-     folder="$(find rosavatar)/data/leds/blue" />
-<binary_led center_pos_x="360" center_pos_y="552" auto_mode_threshold="0.8"
-     folder="$(find rosavatar)/data/leds/blue" />
-<binary_led center_pos_x="429" center_pos_y="552" auto_mode_threshold="0.8"
-     folder="$(find rosavatar)/data/leds/blue" />
-<binary_led center_pos_x="504" center_pos_y="532" auto_mode_threshold="0.9"
-     folder="$(find rosavatar)/data/leds/blue" />
+<binary_led auto_mode_threshold="0.9" folder="$(find rosavatar)/data/leds/blue">
+  <center x="284" y="532"/>
+  <center x="504" y="532"/>
+</binary_led>
+<binary_led auto_mode_threshold="0.8" folder="$(find rosavatar)/data/leds/blue">
+  <center x="360" y="552"/>
+  <center x="429" y="552"/>
+</binary_led>
 
 <!-- bottom line -->
-<binary_led center_pos_x="70"  center_pos_y="475" auto_mode_threshold="0.95"
-     folder="$(find rosavatar)/data/leds/blue" />
-<binary_led center_pos_x="144" center_pos_y="475" auto_mode_threshold="0.9"
-     folder="$(find rosavatar)/data/leds/blue" />
-<binary_led center_pos_x="217" center_pos_y="488" auto_mode_threshold="0.85"
-     folder="$(find rosavatar)/data/leds/blue" />
-<binary_led center_pos_x="284" center_pos_y="488" auto_mode_threshold="0.8"
-     folder="$(find rosavatar)/data/leds/blue" />
-<binary_led center_pos_x="360" center_pos_y="497" auto_mode_threshold="0.75"
-     folder="$(find rosavatar)/data/leds/blue" />
-
-<binary_led center_pos_x="429" center_pos_y="497" auto_mode_threshold="0.75"
-     folder="$(find rosavatar)/data/leds/blue" />
-<binary_led center_pos_x="504" center_pos_y="488" auto_mode_threshold="0.8"
-     folder="$(find rosavatar)/data/leds/blue" />
-<binary_led center_pos_x="577" center_pos_y="488" auto_mode_threshold="0.85"
-     folder="$(find rosavatar)/data/leds/blue" />
-<binary_led center_pos_x="649" center_pos_y="475" auto_mode_threshold="0.9"
-     folder="$(find rosavatar)/data/leds/blue" />
-<binary_led center_pos_x="722" center_pos_y="475" auto_mode_threshold="0.95"
-     folder="$(find rosavatar)/data/leds/blue" />
+<binary_led auto_mode_threshold="0.95" folder="$(find rosavatar)/data/leds/blue">
+  <center x="70" y="475"/>
+  <center x="722" y="475"/>
+</binary_led>
+<binary_led auto_mode_threshold="0.9" folder="$(find rosavatar)/data/leds/blue">
+  <center x="144" y="475"/>
+  <center x="649" y="475"/>
+</binary_led>
+<binary_led auto_mode_threshold="0.85" folder="$(find rosavatar)/data/leds/blue">
+  <center x="217" y="488"/>
+  <center x="577" y="488"/>
+</binary_led>
+<binary_led auto_mode_threshold="0.8" folder="$(find rosavatar)/data/leds/blue">
+  <center x="284" y="488"/>
+  <center x="504" y="488"/>
+</binary_led>
+<binary_led auto_mode_threshold="0.75" folder="$(find rosavatar)/data/leds/blue">
+  <center x="360" y="497"/>
+  <center x="429" y="497"/>
+</binary_led>
 
 <eye folder="$(find rosavatar)/data/mini_eyes">
   <!-- top line -->
-  <center x="186" y="251" flip="0"/>
-  <center x="326" y="334" flip="0"/>
+  <center x="186" y="251"/>
+  <center x="326" y="334"/>
   <center x="472" y="334" flip="1"/>
   <center x="618" y="251" flip="1"/>
   <!-- bottom line -->
-  <center x="186" y="94" flip="0"/>
-  <center x="326" y="173" flip="0"/>
+  <center x="186" y="94"/>
+  <center x="326" y="173"/>
   <center x="472" y="173" flip="1"/>
   <center x="618" y="94" flip="1"/>
 </eye>

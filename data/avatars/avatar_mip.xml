@@ -6,15 +6,25 @@
             file="$(find rosavatar)/data/mip/mip.png"/>
 
 <!-- right eye -->
-<binary_led center_pos_x="413" center_pos_y="186" auto_mode_threshold="0.9"
-     folder="$(find rosavatar)/data/mip/eye" />
-<binary_led center_pos_x="471" center_pos_y="186" auto_mode_threshold="0.8"
-     folder="$(find rosavatar)/data/mip/eye_flip" />
-<!-- left eye -->
-<binary_led center_pos_x="536" center_pos_y="186" auto_mode_threshold="0.8"
-     folder="$(find rosavatar)/data/mip/eye" />
-<binary_led center_pos_x="592" center_pos_y="186" auto_mode_threshold="0.9"
-     folder="$(find rosavatar)/data/mip/eye_flip" />
+<binary_led auto_mode_threshold="0.9" folder="$(find rosavatar)/data/mip/eye">
+  <center x="413" y="189"/>
+</binary_led>
 
-<binary_led center_pos_x="505" center_pos_y="385" auto_mode_threshold="0.7"
-     folder="$(find rosavatar)/data/mip/chest" />
+<binary_led auto_mode_threshold="0.8" folder="$(find rosavatar)/data/mip/eye">
+  <center x="471" y="186" flip="1"/>
+</binary_led>
+
+<!-- left eye -->
+<binary_led auto_mode_threshold="0.8" folder="$(find rosavatar)/data/mip/eye">
+  <center x="536" y="186"/>
+</binary_led>
+
+<binary_led auto_mode_threshold="0.9" folder="$(find rosavatar)/data/mip/eye">
+  <center x="592" y="186" flip="1"/>
+</binary_led>
+
+<!-- chest -->
+<binary_led auto_mode_threshold="0.7" folder="$(find rosavatar)/data/mip/chest">
+  <center x="505" y="385"/>
+</binary_led>
+

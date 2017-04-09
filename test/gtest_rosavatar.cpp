@@ -18,6 +18,17 @@ void test_tags(const std::string & in, const std::string & exp) {
   ASSERT_TRUE(out == exp) << "out:" << out << ", exp:" << exp;
 }
 
+void assert_renderables(SDLAvatar & avatar, int neyes, int nbinary_leds,
+                        int ncolor_leds, int nrenderables_rois) {
+  ASSERT_EQ(avatar.neyes(), neyes);
+  ASSERT_EQ(avatar.nbinary_leds(), nbinary_leds);
+  ASSERT_EQ(avatar.ncolor_leds(), ncolor_leds);
+  ASSERT_EQ(avatar.nrenderables(), neyes + nbinary_leds + ncolor_leds);
+  ASSERT_EQ(avatar.nrenderables_rois(), nrenderables_rois);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 TEST(TestSuite, roscpp) { test_tags("$(find roscpp)", ros::package::getPath("roscpp"));}
 TEST(TestSuite, roslib) { test_tags("$(find roslib)", ros::package::getPath("roslib"));}
 TEST(TestSuite, rosavatar) { test_tags("$(find rosavatar)", ros::package::getPath("rosavatar"));}
@@ -33,6 +44,7 @@ TEST(TestSuite, load_non_existing) {
   ASSERT_TRUE(avatar.init(win_flags));
   ASSERT_TRUE(avatar.get_bg_color() == SDL_Color_ctor(0,0,0));
   ASSERT_FALSE(avatar.from_xml_file("/error.xml", win_flags));
+  assert_renderables(avatar, 0, 0, 0,  0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -40,6 +52,7 @@ TEST(TestSuite, load_non_existing) {
 TEST(TestSuite, avatar_empty) {
   SDLAvatar avatar;
   ASSERT_FALSE(avatar.from_xml_file(datafolder() + "avatar_empty.xml", win_flags));
+  assert_renderables(avatar, 0, 0, 0,  0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -49,6 +62,7 @@ TEST(TestSuite, avatar_wh) {
   ASSERT_TRUE(avatar.from_xml_file(datafolder() + "avatar_empty_wh.xml", win_flags));
   ASSERT_TRUE(avatar.get_bg_color() == SDL_Color_ctor(10,20,30));
   ASSERT_TRUE(avatar.render());
+  assert_renderables(avatar, 0, 0, 0,  0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -56,24 +70,24 @@ TEST(TestSuite, avatar_wh) {
 TEST(TestSuite, avatar_1eye_no_folder) {
   SDLAvatar avatar;
   ASSERT_TRUE(avatar.from_xml_file(datafolder() + "avatar_1eye_no_folder.xml", win_flags));
-  ASSERT_TRUE(avatar.neyes() == 1) << "neyes:" << avatar.neyes();
+  assert_renderables(avatar, 1, 0, 0,  1);
   ASSERT_TRUE(avatar.render());
 }
 TEST(TestSuite, avatar_1eye_bad_folder) {
   SDLAvatar avatar;
   ASSERT_FALSE(avatar.from_xml_file(datafolder() + "avatar_1eye_bad_folder.xml", win_flags));
+  assert_renderables(avatar, 0, 0, 0,  0);
 }
 TEST(TestSuite, avatar_1eye_good_folder) {
   SDLAvatar avatar;
   ASSERT_TRUE(avatar.from_xml_file(datafolder() + "avatar_1eye_good_folder.xml", win_flags));
-  ASSERT_TRUE(avatar.neyes() == 1) << "neyes:" << avatar.neyes();
+  assert_renderables(avatar, 1, 0, 0,  1);
   ASSERT_TRUE(avatar.render());
 }
 TEST(TestSuite, avatar_2eyes) {
   SDLAvatar avatar;
   ASSERT_TRUE(avatar.from_xml_file(datafolder() + "avatar_2eyes.xml", win_flags));
-  ASSERT_TRUE(avatar.neyes()     == 1) << "neyes:" << avatar.neyes();
-  ASSERT_TRUE(avatar.neye_rois() == 2) << "neye_rois:" << avatar.neye_rois();
+  assert_renderables(avatar, 1, 0, 0,  2);
   ASSERT_TRUE(avatar.render());
   ASSERT_TRUE(avatar.set_eyes_state("laughing"));
   for (unsigned int i = 0; i < 10; ++i)
@@ -85,21 +99,19 @@ TEST(TestSuite, avatar_2eyes) {
 TEST(TestSuite, avatar_1led_no_folder) {
   SDLAvatar avatar;
   ASSERT_TRUE(avatar.from_xml_file(datafolder() + "avatar_1led_no_folder.xml", win_flags));
-  ASSERT_TRUE(avatar.nrenderables() == 1)
-      << "nleds:" << avatar.nrenderables();
+  assert_renderables(avatar, 0, 1, 0,  1);
   ASSERT_TRUE(avatar.render());
 }
 TEST(TestSuite, avatar_1led_bad_folder) {
   SDLAvatar avatar;
   ASSERT_TRUE(avatar.from_xml_file(datafolder() + "avatar_1led_bad_folder.xml", win_flags));
-  ASSERT_TRUE(avatar.nrenderables() == 1)
-      << "nleds:" << avatar.nrenderables();
+  assert_renderables(avatar, 0, 1, 0,  1);
   ASSERT_TRUE(avatar.render());
 }
 TEST(TestSuite, avatar_1led_good_folder) {
   SDLAvatar avatar;
   ASSERT_TRUE(avatar.from_xml_file(datafolder() + "avatar_1led_good_folder.xml", win_flags));
-  ASSERT_TRUE(avatar.nrenderables() == 1) << "nleds:" << avatar.nrenderables();
+  assert_renderables(avatar, 0, 1, 0,  1);
   ASSERT_TRUE(avatar.get_renderable(0)->get_name() == "binary_led1")
       << "name:" << avatar.get_renderable(0)->get_name();
   ASSERT_TRUE(avatar.render());
@@ -107,9 +119,9 @@ TEST(TestSuite, avatar_1led_good_folder) {
 TEST(TestSuite, avatar_2leds) {
   SDLAvatar avatar;
   ASSERT_TRUE(avatar.from_xml_file(datafolder() + "avatar_2leds.xml", win_flags));
-  ASSERT_TRUE(avatar.nrenderables() == 2) << "nleds:" << avatar.nrenderables();
-  ASSERT_TRUE(avatar.get_rtype(0) == AvatarRenderable::BINARY_LED);
-  ASSERT_TRUE(avatar.get_rtype(1) == AvatarRenderable::BINARY_LED);
+  assert_renderables(avatar, 0, 2, 0,  2);
+  ASSERT_TRUE(avatar.get_rtype(0) == AvatarRenderable::TYPE_BINARY_LED);
+  ASSERT_TRUE(avatar.get_rtype(1) == AvatarRenderable::TYPE_BINARY_LED);
   BinaryLed* l0 = (BinaryLed*) avatar.get_renderable(0);
   BinaryLed* l1 = (BinaryLed*) avatar.get_renderable(1);
   ASSERT_TRUE(l0->get_name() == "myled") << "name:" << l0->get_name();
@@ -126,9 +138,7 @@ TEST(TestSuite, avatar_2leds) {
 TEST(TestSuite, avatar_2eyes2leds) {
   SDLAvatar avatar;
   ASSERT_TRUE(avatar.from_xml_file(datafolder() + "avatar_2eyes2leds.xml", win_flags));
-  ASSERT_TRUE(avatar.neyes()     == 1) << "neyes:" << avatar.neyes();
-  ASSERT_TRUE(avatar.neye_rois() == 2) << "neye_rois:" << avatar.neye_rois();
-  ASSERT_TRUE(avatar.nrenderables() == 2) << "nleds:" << avatar.nrenderables();
+  assert_renderables(avatar, 1, 2, 0,  4);
   ASSERT_TRUE(avatar.render());
 }
 
@@ -149,9 +159,7 @@ TEST(TestSuite, avatar_change_state) {
 TEST(TestSuite, avatar_mini) {
   SDLAvatar avatar;
   ASSERT_TRUE(avatar.from_xml_file(datafolder() + "avatar_mini.xml", win_flags));
-  ASSERT_TRUE(avatar.neyes()     == 1) << "neyes:" << avatar.neyes();
-  ASSERT_TRUE(avatar.neye_rois() == 2) << "neye_rois:" << avatar.neye_rois();
-  ASSERT_TRUE(avatar.nrenderables() == 6) << "nleds:" << avatar.nrenderables();
+  assert_renderables(avatar, 1, 6, 0,  8);
   ASSERT_TRUE(avatar.render());
 }
 
@@ -160,6 +168,7 @@ TEST(TestSuite, avatar_mini) {
 TEST(TestSuite, avatar_octopus) {
   SDLAvatar avatar;
   ASSERT_TRUE(avatar.from_xml_file(datafolder() + "avatar_octopus.xml", win_flags));
+  assert_renderables(avatar, 1, 7, 0,  22);
   for (unsigned int i = 0; i < 10; ++i)
     ASSERT_TRUE(avatar.render());
   ASSERT_TRUE(avatar.set_eyes_state("laughing"));

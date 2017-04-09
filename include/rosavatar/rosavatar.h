@@ -36,14 +36,13 @@ private:
   }
 
   void state_cb(const std_msgs::StringConstPtr & msg) {
-    for (unsigned int i = 0; i < neyes(); ++i)
-      _eyes[i].set_state(msg->data);
+    set_eyes_state(msg->data);
   }
 
   void mouth_vol_cb(const std_msgs::Float64ConstPtr & msg) {
     // printf("mouth_vol_cb()\n");
     for (unsigned int i = 0; i < nrenderables(); ++i) {
-      if (get_rtype(i) == AvatarRenderable::BINARY_LED) {
+      if (get_rtype(i) == AvatarRenderable::TYPE_BINARY_LED) {
         BinaryLed* renderable = (BinaryLed*) _renderables[i];
         renderable->set_auto_mode_value(msg->data);
       }

@@ -1,4 +1,10 @@
 <?xml version="1.0"?>
 <background width="1600" height="1200" r="150" g="150" b="150"/>
-<binary_led center_pos_x="100" center_pos_y="100" auto_mode_threshold="0.5" name="myled"/>
-<binary_led center_pos_x="200" center_pos_y="100"/>
+<binary_led auto_mode_threshold="0.5" name="myled">
+  <center x="100" y="100"/>
+</binary_led>
+
+<binary_led>
+  <center x="200" y="100"/>
+</binary_led>
+

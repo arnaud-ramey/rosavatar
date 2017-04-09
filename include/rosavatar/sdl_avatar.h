@@ -81,12 +81,39 @@ inline bool replace_colors(SDL_Surface * in, SDL_Surface * out,
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-struct EyeData {
+class AvatarRenderable {
+public:
+  enum Type {
+    TYPE_UNDEFINED = 0,
+    TYPE_EYE = 1,
+    TYPE_BINARY_LED = 2,
+    TYPE_COLOR_LED = 3
+  };
+
+  AvatarRenderable() : _type(TYPE_UNDEFINED) {}
+
+  virtual ~AvatarRenderable() {}
+
+  virtual bool render_center(SDL_Renderer* renderer,
+                             const Point2i & center_position,
+                             bool flip) = 0;
+
+  //////////////////////////////////////////////////////////////////////////////
+
+  std::string get_name()  const { return _name; }
+  void set_name(const std::string & n) { _name = n; }
+  Type get_type() const { return _type; }
+  std::string _name;
   std::vector<Point2i> _center_pos;
   std::vector<bool> _flips;
+protected:
+  Type _type;
 };
 
-class Eye {
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+class Eye : public AvatarRenderable {
 public:
   typedef std::string StateName;
   enum Substate { OPEN = 0, BEGIN = 2, BLINK = 3, END = 4 };
@@ -99,7 +126,9 @@ public:
     unsigned int           _neyelids_blink,  _neyelids_begin,  _neyelids_open;
   }; // end class StateData
 
-  Eye() {}
+  Eye() {
+    _type = TYPE_EYE;
+  }
 
   //////////////////////////////////////////////////////////////////////////////
 
@@ -186,7 +215,7 @@ public:
 
   bool render_center(SDL_Renderer* renderer,
                      const Point2i & center_position,
-                     bool eye_flip) {
+                     bool flip) {
     DEBUG_PRINT("Eye::render_center()\n");
     if (_curr_state.empty()) {
       printf("Eye::render_center(): _curr_state undefined!\n");
@@ -287,7 +316,7 @@ public:
     DEBUG_PRINT("Eye::renderer(): rendering iris...\n");
     _iris.render_center(renderer, center_position + _iris_trans);
     DEBUG_PRINT("Eye::renderer(): rendering eyelid...\n");
-    SDL_RendererFlip sdlflip = (eye_flip ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
+    SDL_RendererFlip sdlflip = (flip ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
     next_eyelid->render_center(renderer, center_position, 1, NULL, 0,
                                Point2d(-1,-1), sdlflip);
     _curr_eyelid = next_eyelid;
@@ -358,36 +387,13 @@ protected:
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-class AvatarRenderable {
-public:
-  enum Type {
-    UNDEFINED = 0,
-    BINARY_LED = 1,
-    COLOR_LED = 2
-  };
-
-  AvatarRenderable() : _type(UNDEFINED) {}
-
-  virtual bool render_center(SDL_Renderer* renderer,
-                             const Point2i & center_position) = 0;
-
-  //////////////////////////////////////////////////////////////////////////////
-
-  std::string get_name()  const { return _name; }
-  void set_name(const std::string & n) { _name = n; }
-  Type get_type() const { return _type; }
-
-protected:
-  Type _type;
-  std::string _name;
-};
 
 class BinaryLed : public AvatarRenderable {
 public:
   enum State { OFF = 0, ON = 1 };
 
   BinaryLed() : _state(OFF), _auto_mode(false) {
-    _type = BINARY_LED;
+    _type = TYPE_BINARY_LED;
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -426,10 +432,13 @@ public:
   //////////////////////////////////////////////////////////////////////////////
 
   bool render_center(SDL_Renderer* renderer,
-                     const Point2i & center_position) {
+                     const Point2i & center_position,
+                     bool flip) {
     DEBUG_PRINT("BinaryLed::render_center()\n");
     Texture* to_copy = &(_state == OFF ? _off_img : _on_img);
-    to_copy->render_center(renderer, center_position);
+    SDL_RendererFlip sdlflip = (flip ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
+    to_copy->render_center(renderer, center_position, 1, NULL, 0,
+                           Point2d(-1,-1), sdlflip);
     return true;
   } // end render_center();
 
@@ -455,7 +464,7 @@ public:
   typedef SDL_Color Color;
 
   ColorLed() {
-    _type = COLOR_LED;
+    _type = TYPE_COLOR_LED;
   }
 
   bool from_imgs(SDL_Renderer* renderer,
@@ -483,9 +492,13 @@ public:
   //////////////////////////////////////////////////////////////////////////////
 
   bool render_center(SDL_Renderer* renderer,
-                     const Point2i & center_position) {
-    _bg_img.render_center(renderer, center_position);
-    _top_img.render_center(renderer, center_position);
+                     const Point2i & center_position,
+                     bool flip) {
+    SDL_RendererFlip sdlflip = (flip ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
+    _bg_img.render_center(renderer, center_position, 1, NULL, 0,
+                          Point2d(-1,-1), sdlflip);
+    _top_img.render_center(renderer, center_position, 1, NULL, 0,
+                           Point2d(-1,-1), sdlflip);
     return true;
   } // end render_center();
 
@@ -509,7 +522,6 @@ public:
   typedef vision_utils::XmlDocument::Node Node;
 
   SDLAvatar()  : _init_done(false), _renderer(NULL), _window(NULL) {
-    _eyes.reserve(100);
   }
 
   bool init(int winw = 640, int winh = 480,
@@ -557,9 +569,9 @@ public:
 
   ~SDLAvatar() {
     // clear components
-    _eye_datas.clear();
+    for (unsigned int i = 0; i < _renderables.size(); ++i)
+      delete _renderables[i];
     _renderables.clear();
-    _renderable_centers.clear();
     if (_renderer)
       SDL_DestroyRenderer(_renderer);
     if (_window)
@@ -569,6 +581,66 @@ public:
   }
 
   //////////////////////////////////////////////////////////////////////////////
+
+  bool renderable_from_xml_node_list(vision_utils::XmlDocument & doc,
+                                     std::vector<Node*> nodes,
+                                     AvatarRenderable::Type type) {
+    std::vector<Node*> center_nodes;
+    for (unsigned int i = 0; i < nodes.size(); ++i) {
+      Node* rnode = nodes[i];
+      std::string folder = doc.get_node_attribute(rnode, "folder");
+      std::string folder_clean = vision_utils::replace_find_tags(folder);
+      DEBUG_PRINT("Renderable folder:'%s'\n", folder.c_str());
+      AvatarRenderable* renderable;
+      std::string safe_name;
+      if (type == AvatarRenderable::TYPE_EYE) {
+        safe_name = std::string("eye") + vision_utils::cast_to_string(1+neyes());
+        renderable = new Eye();
+        Eye* eye = (Eye*) renderable;
+        if (!eye->from_imgs(_renderer, folder_clean))
+          return false;
+      }
+      else if (type == AvatarRenderable::TYPE_BINARY_LED) {
+        safe_name = std::string("binary_led") + vision_utils::cast_to_string(1+nbinary_leds());
+        renderable = new BinaryLed();
+        BinaryLed* led = (BinaryLed*) renderable;
+        if (!led->from_imgs(_renderer, folder_clean))
+          return false;
+        bool has_auto_mode = doc.has_node_attribute(rnode, "auto_mode_threshold");
+        double auto_mode_threshold = doc.get_node_attribute(rnode, "auto_mode_threshold", -1.0);
+        if (has_auto_mode)
+          led->set_auto_mode(auto_mode_threshold);
+
+      }
+      else if (type == AvatarRenderable::TYPE_COLOR_LED) {
+        safe_name = std::string("color_led") + vision_utils::cast_to_string(1+ncolor_leds());
+        renderable = new ColorLed();
+        ColorLed* led = (ColorLed*) renderable;
+        if (!led->from_imgs(_renderer, folder_clean))
+          return false;
+      }
+      else {
+        ROS_WARN("Unknown type: %i", type);
+        return false;
+      }
+      // parse centers and flips
+      doc.get_all_nodes_at_direction(rnode, "center", center_nodes);
+      for (unsigned int j = 0; j < center_nodes.size(); ++j) {
+        Node* center_node = center_nodes[j];
+        int x = doc.get_node_attribute(center_node, "x", 0);
+        int y = doc.get_node_attribute(center_node, "y", 0);
+        bool flip = doc.get_node_attribute(center_node, "flip", false);
+        renderable->_center_pos.push_back(Point2i(x, y));
+        renderable->_flips.push_back(flip);
+      } // end for j
+      // load eye imgs if needed
+      std::string xml_name = doc.get_node_attribute(rnode, "name");
+      renderable->set_name(xml_name.empty() ? safe_name : xml_name);
+
+      _renderables.push_back(renderable);
+    } // end for i
+    return true; // success
+  }
 
   bool from_xml_file(const std::string & filename,
                      Uint32 win_flags = 0) {
@@ -597,104 +669,19 @@ public:
       _bg_color = SDL_Color_ctor(r, g, b);
     }
 
-    // get eye nodes
-    std::vector<Node*> eye_nodes, center_nodes;
-    doc.get_all_nodes_at_direction(doc.root(), "eye", eye_nodes);
-    for (unsigned int i = 0; i < eye_nodes.size(); ++i) {
-      Node* eye_node = eye_nodes[i];
-      std::string folder = doc.get_node_attribute(eye_node, "folder");
-      DEBUG_PRINT("Eye folder:'%s'\n", folder.c_str());
-      // load eye imgs if needed
-      std::vector<Point2i> eye_centers;
-      std::vector<bool> eye_flips;
-      doc.get_all_nodes_at_direction(eye_node, "center", center_nodes);
-      for (unsigned int j = 0; j < center_nodes.size(); ++j) {
-        Node* center_node = center_nodes[j];
-        int x = doc.get_node_attribute(center_node, "x", 0);
-        int y = doc.get_node_attribute(center_node, "y", 0);
-        bool flip = doc.get_node_attribute(center_node, "flip", false);
-        eye_centers.push_back(Point2i(x, y));
-        eye_flips.push_back(flip);
-      } // end for j
-      if (!add_eye(eye_centers, eye_flips,
-                   vision_utils::replace_find_tags(folder)))
-        return false;
-    } // end for i
+    std::vector<Node*> rnodes;
+    doc.get_all_nodes_at_direction(doc.root(), "eye", rnodes);
+    if (!renderable_from_xml_node_list(doc, rnodes, AvatarRenderable::TYPE_EYE))
+      return false;
 
-    // get binary led nodes
-    std::vector<Node*> binary_led_nodes;
-    doc.get_all_nodes_at_direction(doc.root(), "binary_led", binary_led_nodes);
-    for (unsigned int i = 0; i < binary_led_nodes.size(); ++i) {
-      Node* led_node = binary_led_nodes[i];
-      std::string folder = doc.get_node_attribute(led_node, "folder");
-      std::string xml_name = doc.get_node_attribute(led_node, "name");
-      int center_pos_x = doc.get_node_attribute(led_node, "center_pos_x", 0);
-      int center_pos_y = doc.get_node_attribute(led_node, "center_pos_y", 0);
-      bool has_auto_mode = doc.has_node_attribute(led_node, "auto_mode_threshold");
-      double auto_mode_threshold = doc.get_node_attribute(led_node, "auto_mode_threshold", -1.0);
-      // load led imgs if needed
-      BinaryLed* led = new BinaryLed();
-      if (!led->from_imgs(_renderer, vision_utils::replace_find_tags(folder)))
-        return false;
-      if (has_auto_mode)
-        led->set_auto_mode(auto_mode_threshold);
-      std::string real_name = (xml_name.empty() ?
-                                 std::string("binary_led")
-                                 + vision_utils::cast_to_string(1+_renderables.size())
-                               : xml_name);
-      led->set_name(real_name);
-      _renderables.push_back(led);
-      _renderable_centers.push_back(Point2i(center_pos_x, center_pos_y));
-    } // end for i
+    doc.get_all_nodes_at_direction(doc.root(), "binary_led", rnodes);
+    if (!renderable_from_xml_node_list(doc, rnodes, AvatarRenderable::TYPE_BINARY_LED))
+      return false;
 
-    // get color led nodes
-    std::vector<Node*> color_led_nodes;
-    doc.get_all_nodes_at_direction(doc.root(), "color_led", color_led_nodes);
-    for (unsigned int i = 0; i < color_led_nodes.size(); ++i) {
-      Node* led_node = color_led_nodes[i];
-      std::string folder = doc.get_node_attribute(led_node, "folder");
-      std::string xml_name = doc.get_node_attribute(led_node, "name");
-      int center_pos_x = doc.get_node_attribute(led_node, "center_pos_x", 0);
-      int center_pos_y = doc.get_node_attribute(led_node, "center_pos_y", 0);
-      // load led imgs if needed
-      ColorLed* led = new ColorLed();
-      if (!led->from_imgs(_renderer, vision_utils::replace_find_tags(folder)))
-        return false;
-      std::string real_name = (xml_name.empty() ?
-                                 std::string("color_led") + vision_utils::cast_to_string(_renderables.size())
-                               : xml_name);
-      led->set_name(real_name);
-      _renderables.push_back(led);
-      _renderable_centers.push_back(Point2i(center_pos_x, center_pos_y));
-    } // end for i
+    doc.get_all_nodes_at_direction(doc.root(), "color_led", rnodes);
+    if (!renderable_from_xml_node_list(doc, rnodes, AvatarRenderable::TYPE_COLOR_LED))
+      return false;
     return true; // success
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-
-  bool add_eye(const std::vector<Point2i> & center_pos,
-               const std::vector<bool> & eye_flips,
-               const std::string & eyes_folder = "") {
-    unsigned int npos = center_pos.size();
-    DEBUG_PRINT("add_eye(%i positions)\n", npos);
-    if (!npos) {
-      printf("add_eye(): you didn't supply any center position for the eye to be drawn\n");
-      return false;
-    }
-    if (eye_flips.size() != npos) {
-      printf("add_eye(): inconsisitent size %li != %i\n", eye_flips.size(), npos);
-      return false;
-    }
-    // read eye
-    _eyes.push_back(Eye());
-    if (!_eyes.back().from_imgs(_renderer, eyes_folder))
-      return false;
-
-    EyeData data;
-    data._center_pos = center_pos;
-    data._flips = eye_flips;
-    _eye_datas.push_back(data);
-    return true;
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -705,13 +692,12 @@ public:
     if (!init(w, h, win_flags))
       return false;
     // add eyes
-    std::vector<Point2i> center_pos;
-    std::vector<bool> eye_flips;
-    center_pos.push_back(Point2i(  w/3, h/4));
-    center_pos.push_back(Point2i(2*w/3, h/4));
-    eye_flips.push_back(false);
-    eye_flips.push_back(true);
-    if (!add_eye(center_pos, eye_flips, ""))
+    Eye* eye  = new Eye();
+    eye->_center_pos.push_back(Point2i(  w/3, h/4));
+    eye->_flips.push_back(false);
+    eye->_center_pos.push_back(Point2i(2*w/3, h/4));
+    eye->_flips.push_back(true);
+    if (!eye->from_imgs(_renderer, ""))
       return false;
     // leds
     unsigned int nleds = 5;
@@ -721,8 +707,9 @@ public:
       if (!led->from_imgs(_renderer, ""))
         return false;
       led->set_auto_mode(led_ratio);
+      led->_center_pos.push_back(Point2i(iled*w/(nleds+1), 3*h/4 - led_ratio * h/4));
+      led->_flips.push_back(false);
       _renderables.push_back(led);
-      _renderable_centers.push_back(Point2i(iled*w/(nleds+1), 3*h/4 - led_ratio * h/4));
     }
     return render();
   } // end load_default_avatar();
@@ -731,7 +718,10 @@ public:
 
   bool set_eyes_state(const Eye::StateName & state){
     for (unsigned int i = 0; i < neyes(); ++i) {
-      if (!_eyes[i].set_state(state))
+      if (_renderables[i]->get_type() != AvatarRenderable::TYPE_EYE)
+        continue;
+      Eye* eye = (Eye*) _renderables[i];
+      if (!eye->set_state(state))
         return false;
     } // end for i
     return true;
@@ -741,8 +731,12 @@ public:
 
   //! irisx, irisy in [-1, 1]
   inline void move_iris(double irisx, double irisy) {
-    for (unsigned int i = 0; i < _eyes.size(); ++i)
-      _eyes[i].move_iris(irisx, irisy);
+    for (unsigned int i = 0; i < neyes(); ++i) {
+      if (_renderables[i]->get_type() != AvatarRenderable::TYPE_EYE)
+        continue;
+      Eye* eye = (Eye*) _renderables[i];
+      eye->move_iris(irisx, irisy);
+    } // end for i
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -760,22 +754,21 @@ public:
     } else {
       _bg.render(_renderer, Point2i());
     }
-    // eyes
-    for (unsigned int i_eye = 0; i_eye < neyes(); ++i_eye) {
-      Eye* eye = &(_eyes[i_eye]);
-      EyeData* data = &(_eye_datas[i_eye]);
-      unsigned int nrois = data->_center_pos.size();
-      for (unsigned int i_roi = 0; i_roi < nrois; ++i_roi) {
-        DEBUG_PRINT("Avatar: rendering eye %i, ROI %i\n", i_eye, i_roi);
-        if (!eye->render_center(_renderer, data->_center_pos[i_roi], data->_flips[i_roi])) {
-          printf("Avatar::render_center(): Eye::render_center() went wrong!\n");
-          return false;
-        }
-      } // end for i_roi
-    } // end for i_eye
-    // leds
-    for (unsigned int i_led = 0; i_led < nrenderables(); ++i_led)
-      _renderables[i_led]->render_center(_renderer, _renderable_centers[i_led]);
+    // AvatarRenderables
+    for (unsigned int i = 0; i < nrenderables(); ++i) {
+      AvatarRenderable* renderable = (_renderables[i]);
+      unsigned int npos = renderable->_center_pos.size();
+      if (npos != renderable->_flips.size()) {
+        ROS_WARN("Avatar::render_center(): insconsisitent data size %i != %li",
+                 npos, renderable->_flips.size());
+        return false;
+      }
+      for (unsigned int j = 0; j < npos; ++j) {
+        renderable->render_center(_renderer,
+                                  renderable->_center_pos[j],
+                                  renderable->_flips[j]);
+      } // end for j
+    } // end for i
     SDL_RenderPresent( _renderer);
     return true;
   } // end render_center()
@@ -783,26 +776,34 @@ public:
   //////////////////////////////////////////////////////////////////////////////
 
   inline SDL_Color    get_bg_color()                     const { return _bg_color; }
-  inline const Eye &  get_eye(int i)                     const { return _eyes[i]; }
+  inline Eye *        get_eye(int i)                     const { return (Eye*) _renderables[i]; }
   inline const AvatarRenderable*  get_renderable(int i)  const { return _renderables[i]; }
   inline AvatarRenderable::Type   get_rtype(int i)       const { return _renderables[i]->get_type(); }
   inline unsigned int nrenderables()                     const { return _renderables.size(); }
-  inline unsigned int neyes()                            const { return _eyes.size(); }
-  inline unsigned int neye_rois()                        const {
+  inline unsigned int nrenderables_rois()                const {
     unsigned int ans = 0;
-    for (unsigned int i = 0; i < _eye_datas.size(); ++i)
-      ans += _eye_datas[i]._center_pos.size();
+    for (unsigned int i = 0; i < _renderables.size(); ++i)
+      ans += _renderables[i]->_center_pos.size();
     return ans;
   }
+  inline unsigned int ntype(AvatarRenderable::Type type) const {
+    unsigned int ans = 0;
+    for (unsigned int i = 0; i < _renderables.size(); ++i) {
+      if (_renderables[i]->get_type() == type)
+        ans ++;
+    }
+    return ans;
+  }
+  inline unsigned int neyes() const        { return ntype(AvatarRenderable::TYPE_EYE); }
+  inline unsigned int nbinary_leds() const { return ntype(AvatarRenderable::TYPE_BINARY_LED); }
+  inline unsigned int ncolor_leds() const  { return ntype(AvatarRenderable::TYPE_COLOR_LED); }
+
 
 protected:
 
   //////////////////////////////////////////////////////////////////////////////
 
   std::vector<AvatarRenderable*> _renderables;
-  std::vector<Point2i> _renderable_centers;
-  std::vector<Eye> _eyes;
-  std::vector<EyeData> _eye_datas;
   // SDL stuff
   bool _init_done;
   SDL_Renderer* _renderer;
