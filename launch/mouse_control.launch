@@ -2,7 +2,7 @@
 
 <!-- mouse position to face coords -->
 <remap from="win2point/point" to="/avatar/iris_position"/>
-<remap from="win2point/state" to="/avatar/state"/>
+<remap from="win2point/eyes_state" to="/avatar/eyes_state"/>
 <node pkg="rosavatar" type="win2point.exe" name="win2point"  output="screen" respawn="true"/>
 
 <!-- mic volume monitor -->
@@ -12,10 +12,10 @@
 
 <!-- avatar -->
 <node pkg="rosavatar" type="rosavatar.exe" name="avatar" output="screen" required="true">
-  <param name="xml_file" value="$(find rosavatar)/data/avatars/avatar_unai.xml"/>
-<!--
-  <param name="xml_file" value="$(find rosavatar)/data/avatars/avatar_octopus.xml"/>
   <param name="xml_file" value="$(find rosavatar)/data/avatars/avatar_mip.xml"/>
+<!--
+  <param name="xml_file" value="$(find rosavatar)/data/avatars/avatar_unai.xml"/>
+  <param name="xml_file" value="$(find rosavatar)/data/avatars/avatar_octopus.xml"/>
   <param name="xml_file" value="$(find rosavatar)/data/avatars/avatar_mini.xml"/>
 -->
 </node>

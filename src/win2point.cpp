@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
   ros::init(argc, argv, win_name);
   ros::NodeHandle nh_private("~");
   point_pub = nh_private.advertise<geometry_msgs::Point>("point", 1);
-  state_pub = nh_private.advertise<std_msgs::String>("state", 1);
+  state_pub = nh_private.advertise<std_msgs::String>("eyes_state", 1);
   states.push_back("angry");
   states.push_back("laughing");
   states.push_back("normal");

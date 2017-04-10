@@ -25,8 +25,6 @@ ________________________________________________________________________________
 #ifndef SDL_AVATAR_H
 #define SDL_AVATAR_H
 
-//#define DEBUG // to activate all the printf(), also used in sdl_utils
-
 // utils
 #include "vision_utils/all_files_in_dir.h"
 #include "vision_utils/all_subfolders.h"
@@ -37,6 +35,13 @@ ________________________________________________________________________________
 #include "vision_utils/XmlDocument.h"
 // C
 #include <dirent.h>
+
+//#define DEBUG // to activate all the printf()
+#ifdef DEBUG
+#  define DEBUG_PRINT(...)   printf( __VA_ARGS__)
+#else
+#  define DEBUG_PRINT(...)   {}
+#endif
 
 //! \return false if problem
 inline bool imread_all_files_in_dir(SDL_Renderer* renderer,
@@ -58,17 +63,26 @@ inline bool imread_all_files_in_dir(SDL_Renderer* renderer,
   return true;
 } // end imread_all_files_in_dir()
 
-inline bool replace_colors(SDL_Surface * in, SDL_Surface * out,
-                           SDL_Color find, SDL_Color replacewith) {
+////////////////////////////////////////////////////////////////////////////////
+
+inline bool replace_color(SDL_Surface * in, SDL_Surface * & out,
+                          const SDL_Color & find, const SDL_Color & replacewith) {
+  DEBUG_PRINT("replace_colors(%i,%i,%i,%i -> %i,%i,%i,%i)\n",
+              find.r, find.g, find.b, find.a,
+              replacewith.r, replacewith.g, replacewith.b, replacewith.a);
   unsigned int w = in->w, h = in->h;
   if(!in || !w || !h)
     return false;
   Uint32 f = color2int(find), r = color2int(replacewith);
-  SDL_FreeSurface(out);
-  SDL_BlitSurface(in, NULL, out, NULL);
-  //  *out = SDL_CreateRGBSurface(in->flags, w, h, in->format->BitsPerPixel,
-  //                              in->format->Rmask, in->format->Gmask,
-  //                              in->format->Bmask, in->format->Amask);
+  if (out)
+    SDL_FreeSurface(out);
+  out = SDL_CreateRGBSurface(in->flags, w, h, in->format->BitsPerPixel,
+                             in->format->Rmask, in->format->Gmask,
+                             in->format->Bmask, in->format->Amask);
+  if (SDL_BlitSurface(in, NULL, out, NULL) < 0) {
+    printf("SDL_BlitSurface() returned an error: '%s'\n", SDL_GetError());
+    return false;
+  }
   for(unsigned int y = 0; y < h; y++) {
     for(unsigned int x = 0; x < w; x++) {
       if (getpixel(in, x, y) == f)
@@ -465,6 +479,7 @@ public:
 
   ColorLed() {
     _type = TYPE_COLOR_LED;
+    _tofind_color = SDL_Color_ctor(0, 255, 0, 255);
   }
 
   bool from_imgs(SDL_Renderer* renderer,
@@ -472,21 +487,30 @@ public:
     DEBUG_PRINT("ColorLed::from_imgs('%s')\n", led_prefix.c_str());
     if (led_prefix.empty())
       return from_default_imgs(renderer);
-    std::ostringstream bg_file, top_file;
+    std::ostringstream bg_file, fg_file;
     bg_file << led_prefix << "_bg.png";
-    top_file << led_prefix << "_top.png";
-    return (!_bg_img.from_file(renderer, bg_file.str())
-            || _top_img.from_file(renderer, top_file.str()));
+    fg_file << led_prefix << "_fg.png";
+    if(!_bg_img.from_file(renderer, bg_file.str())
+       || !_fg_img.from_file(renderer, fg_file.str()))
+      return false;
+    return set_color(renderer, SDL_Color_ctor(0, 0, 0));
   } // end from_imgs();
 
   //////////////////////////////////////////////////////////////////////////////
 
-  inline bool set_color(SDL_Renderer* renderer, Color c) {
-    SDL_Surface* tmp;
+  inline void set_tofind_color(const Color & tf) {
+    _tofind_color = tf;
+  }
+
+  inline bool set_color(SDL_Renderer* renderer, const Color & c) {
+    DEBUG_PRINT("set_colors(%i,%i,%i,%i)\n", c.r, c.g, c.b, c.a);
+    SDL_Surface* tmp = NULL;
     _color = c;
-    if (!replace_colors(_bg_img.get_sdlsurface_raw(), tmp, _tofind_color, _color)
+    if (!replace_color(_bg_img.get_sdlsurface_raw(), tmp, _tofind_color, _color)
         || !_bg_tinted_img.from_surface(tmp, renderer))
       return false;
+    SDL_FreeSurface(tmp);
+    return true;
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -495,10 +519,10 @@ public:
                      const Point2i & center_position,
                      bool flip) {
     SDL_RendererFlip sdlflip = (flip ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
-    _bg_img.render_center(renderer, center_position, 1, NULL, 0,
+    _bg_tinted_img.render_center(renderer, center_position, 1, NULL, 0,
                           Point2d(-1,-1), sdlflip);
-    _top_img.render_center(renderer, center_position, 1, NULL, 0,
-                           Point2d(-1,-1), sdlflip);
+    _fg_img.render_center(renderer, center_position, 1, NULL, 0,
+                          Point2d(-1,-1), sdlflip);
     return true;
   } // end render_center();
 
@@ -511,7 +535,7 @@ protected:
   }
 
   Color _tofind_color, _color;
-  Texture _top_img, _bg_img, _bg_tinted_img;
+  Texture _fg_img, _bg_img, _bg_tinted_img;
 }; // end class Led
 
 ////////////////////////////////////////////////////////////////////////////////

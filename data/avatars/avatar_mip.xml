@@ -24,7 +24,12 @@
 </binary_led>
 
 <!-- chest -->
+<!--
 <binary_led auto_mode_threshold="0.7" folder="$(find rosavatar)/data/mip/chest">
   <center x="505" y="385"/>
 </binary_led>
+-->
+<color_led auto_mode_threshold="0.7" folder="$(find rosavatar)/data/mip/chest">
+  <center x="505" y="385"/>
+</color_led>
 

@@ -64,8 +64,8 @@ public:
     // params
     _nh_private.param("display", _display, false);
     // publishers and subscribers
-    _point_pub = _nh_private.advertise<geometry_msgs::Point>("out", 1);
-    _state_pub = _nh_private.advertise<std_msgs::String>("state", 1);
+    _point_pub = _nh_private.advertise<geometry_msgs::Point>("point", 1);
+    _state_pub = _nh_private.advertise<std_msgs::String>("eyes_state", 1);
     _rgb_sub = _it.subscribe("rgb", QUEUE_SIZE, &Face2Point::rgb_cb, this);
   }
   ~Face2Point() {}

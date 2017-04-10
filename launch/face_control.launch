@@ -10,8 +10,8 @@
 </node>
 
 <!-- rgb image to face coords -->
-<remap from="face2point/out"   to="/avatar/iris_position"/>
-<remap from="face2point/state" to="/avatar/state"/>
+<remap from="face2point/point"   to="/avatar/iris_position"/>
+<remap from="face2point/eyes_state" to="/avatar/eyes_state"/>
 <node pkg="rosavatar" type="face2point.exe" name="face2point"  output="screen" respawn="true"
       args="_display:=true" />
 
@@ -24,8 +24,4 @@
 <node pkg="rosavatar" type="rosavatar.exe" name="avatar" output="screen" respawn="true">
   <param name="xml_file" value="$(find rosavatar)/data/avatars/avatar_octopus.xml"/>
 </node>
-
-<!-- show avatar with image_view -->
-<node pkg="image_view" type="image_view"   name="avatar_viewer" output="screen" respawn="true"
-      args="image:=/avatar/avatar_image"/>
 </launch>

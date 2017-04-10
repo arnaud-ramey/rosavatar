@@ -39,6 +39,45 @@ TEST(TestSuite, rosavatar2) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void test_int2color2int(Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
+  SDL_Color in = SDL_Color_ctor(r, g, b, a);
+  Uint32 i = color2int(in);
+  SDL_Color out = int2color(i);
+  ASSERT_EQ(in.r, out.r);
+  ASSERT_EQ(in.g, out.g);
+  ASSERT_EQ(in.b, out.b);
+  ASSERT_EQ(in.a, out.a);
+}
+
+TEST(TestSuite, int2color2int_black) { test_int2color2int(0, 0, 0, 255); }
+TEST(TestSuite, int2color2int_red) { test_int2color2int(255, 0, 0, 255); }
+TEST(TestSuite, int2color2int_green) { test_int2color2int(0, 255, 0, 255); }
+TEST(TestSuite, int2color2int_blue) { test_int2color2int(0, 0, 255, 255); }
+TEST(TestSuite, int2color2int_white) { test_int2color2int(255, 255, 255, 255); }
+TEST(TestSuite, int2color2int_white_trans) { test_int2color2int(255, 0, 0, 128); }
+TEST(TestSuite, int2color2int_rand) {
+  test_int2color2int(rand()%255, rand()%255, rand()%255, rand()%255);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+TEST(TestSuite, replace_color) {
+  std::string file = ros::package::getPath("rosavatar") + "/data/mip/chest_bg.png";
+  SDL_Surface* in = IMG_Load(file.c_str()), *out = NULL;
+  ASSERT_EQ(in->w, 106);
+  ASSERT_EQ(in->h, 127);
+  for (unsigned int g = 0; g <= 255; g+=15) {
+    SDL_Color cin = SDL_Color_ctor(0,g,0), cout = SDL_Color_ctor(0,0,g);
+    ASSERT_TRUE(replace_color(in, out, cin, cout));
+    ASSERT_TRUE(out != NULL);
+    ASSERT_EQ(out->w, in->w);
+    ASSERT_EQ(out->h, in->h);
+    ASSERT_TRUE(IMG_SavePNG(out, "/tmp/test_replace_color.png") >= 0);
+  } // end for g
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 TEST(TestSuite, load_non_existing) {
   SDLAvatar avatar;
   ASSERT_TRUE(avatar.init(win_flags));

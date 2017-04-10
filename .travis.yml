@@ -45,7 +45,7 @@ script: # compile
   - catkin_make
   # compile tests
   - cd build
-  - make tests
+  - make all tests
   # run tests
   # Tests cannot be run without a graphical environment, which Travis hasn't.
   # You get the error: 'No available video device'
