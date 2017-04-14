@@ -66,6 +66,8 @@ TEST(TestSuite, replace_color) {
   SDL_Surface* in = IMG_Load(file.c_str()), *out = NULL;
   ASSERT_EQ(in->w, 106);
   ASSERT_EQ(in->h, 127);
+  int x = 50, y = 50;
+  ASSERT_EQ(getpixel(in, x, y), color2int(0, 255, 0));
   for (unsigned int g = 0; g <= 255; g+=15) {
     SDL_Color cin = SDL_Color_ctor(0,g,0), cout = SDL_Color_ctor(0,0,g);
     ASSERT_TRUE(replace_color(in, out, cin, cout));
@@ -74,6 +76,7 @@ TEST(TestSuite, replace_color) {
     ASSERT_EQ(out->h, in->h);
     ASSERT_TRUE(IMG_SavePNG(out, "/tmp/test_replace_color.png") >= 0);
   } // end for g
+  ASSERT_EQ(getpixel(out, x, y), color2int(0, 0, 255));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
