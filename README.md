@@ -2,11 +2,9 @@
 
 [![Build Status](https://travis-ci.org/arnaud-ramey/rosavatar.svg)](https://travis-ci.org/arnaud-ramey/rosavatar)
 
-<p align="center">
-  <img src="doc/sample_boy.png" alt="sample_boy" style="height: 150px" border="1"/>
-  <img src="doc/sample_mip.png" alt="sample_mip" style="height: 150px" border="1"/>
-  <img src="doc/sample_octopus.png" alt="sample_octopus" style="height: 150px"  border="1"/>
-</p>
+![sample_boy](doc/sample_boy_thumb.png)
+![sample_mip](doc/sample_mip_thumb.png)
+![sample_octopus](doc/sample_octopus_thumb.png)
 
 This package renders virtual faces that can be controlled with ROS topics.
 
