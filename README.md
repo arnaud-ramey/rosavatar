@@ -2,8 +2,13 @@
 
 [![Build Status](https://travis-ci.org/arnaud-ramey/rosavatar.svg)](https://travis-ci.org/arnaud-ramey/rosavatar)
 
-The camera package provides nodes to acquire information from a camera device.
-  It wraps the popular driver packages "uvc_cam" and "usb_cam".
+<p align="center">
+  <img src="doc/sample_boy.png" alt="sample_boy" style="height: 150px" border="1"/>
+  <img src="doc/sample_mip.png" alt="sample_mip" style="height: 150px" border="1"/>
+  <img src="doc/sample_octopus.png" alt="sample_octopus" style="height: 150px"  border="1"/>
+</p>
+
+This package renders virtual faces that can be controlled with ROS topics.
 
 Parameters
 ==========
