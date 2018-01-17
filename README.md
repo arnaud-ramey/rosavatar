@@ -8,6 +8,24 @@
 
 This package renders virtual faces that can be controlled with ROS topics.
 
+How to install
+==============
+
+Please run the [rosdep](http://docs.ros.org/independent/api/rosdep/html/) utility:
+
+```bash
+$ sudo apt-get install python-rosdep
+$ sudo rosdep init
+$ rosdep install rosavatar --ignore-src
+```
+
+Some dependencies must be installed manually as they are not included
+in ```rosdep```:
+
+```bash
+$ sudo apt install libsdl2-image-dev
+```
+
 Parameters
 ==========
 

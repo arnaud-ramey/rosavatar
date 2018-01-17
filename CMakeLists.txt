@@ -19,10 +19,7 @@ catkin_package(
   CATKIN_DEPENDS roscpp cv_bridge image_transport
 )
 ### 7 - Libraries/Executables to build (add_library()/add_executable()/target_link_libraries())
-include_directories(
-  include
-  ${catkin_INCLUDE_DIRS}
-)
+include_directories( include ${catkin_INCLUDE_DIRS} ${SDL2_INCLUDE_DIR})
 ADD_SUBDIRECTORY(src)
 ### 8 - Tests to build (catkin_add_gtest())
 ADD_SUBDIRECTORY(test)
